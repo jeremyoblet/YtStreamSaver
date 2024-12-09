@@ -1,0 +1,17 @@
+{
+  "name": "YouTube Quality Changer",
+  "version": "1.0",
+  "manifest_version": 3,
+  "description": "Change la qualité YouTube quand l’onglet change de visibilité et notifie dans le popup.",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://www.youtube.com/watch*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "permissions": ["scripting", "tabs"]
+}
