@@ -1,9 +1,17 @@
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) {
-    setPlayerQuality("144p");
-  } else {
-    setPlayerQuality("Auto");
-  }
+  chrome.storage.sync.get(
+    {
+      visibleQuality: 'Auto',
+      hiddenQuality: '144p'
+    },
+    (items) => {
+      if (document.hidden) {
+        setPlayerQuality(items.hiddenQuality);
+      } else {
+        setPlayerQuality(items.visibleQuality);
+      }
+    }
+  );
 });
 
 function setPlayerQuality(targetQuality) {
@@ -23,7 +31,7 @@ function setPlayerQuality(targetQuality) {
           if (desired) {
             desired.click();
           } else {
-            // Si la qualité souhaitée n'est pas trouvée, on prend la plus basse
+            // Si pas disponible, on prend la plus basse
             const lowest = qualities[qualities.length - 1];
             if (lowest) {
               lowest.click();
@@ -31,9 +39,14 @@ function setPlayerQuality(targetQuality) {
             }
           }
 
-          console.log(`Qualité réglée sur : ${finalQuality}`);
-          // Envoyer un message au background pour qu'il affiche une notification
-          chrome.runtime.sendMessage({type: "qualityChanged", quality: finalQuality});
+          console.log(`Video quality : ${finalQuality}`);
+
+          // Vérifier si les notifications sont actives
+          chrome.storage.sync.get({ notificationsEnabled: true }, (items) => {
+            if (items.notificationsEnabled) {
+              chrome.runtime.sendMessage({type: "qualityChanged", quality: finalQuality});
+            }
+          });
 
         }, 500);
       }

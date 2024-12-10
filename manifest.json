@@ -1,9 +1,9 @@
 {
   "name": "YouTube Quality Notifier",
-  "version": "1.0",
+  "version": "1.1",
   "manifest_version": 3,
   "description": "Notifie lorsque la qualité YouTube change.",
-  "permissions": ["notifications"],
+  "permissions": ["notifications", "storage"],
   "background": {
     "service_worker": "background.js"
   },
@@ -12,5 +12,9 @@
       "matches": ["*://www.youtube.com/watch*"],
       "js": ["content.js"]
     }
-  ]
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  }
 }

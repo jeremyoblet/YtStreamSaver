@@ -8,8 +8,8 @@ function showNotification(quality) {
   chrome.notifications.create({
     type: 'basic',
     iconUrl: 'icon.png',
-    title: 'Qualité changée',
-    message: `La qualité de la vidéo est maintenant : ${quality}`
+    title: 'Quality changed',
+    message: `${quality}`
   }, notificationId => {
     setTimeout(() => {
       chrome.notifications.clear(notificationId);
