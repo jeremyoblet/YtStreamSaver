@@ -9,6 +9,8 @@
       width: 250px;
       background: linear-gradient(135deg, #a5d6a7, #81c784);
       color: #2e7d32;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
 
     h1 {
@@ -58,25 +60,22 @@
       background: #388e3c;
     }
 
-    /* Ajouter une légère ombre et une bordure arrondie au conteneur principal */
-    body {
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    }
-
-    /* Style du checkbox */
-    input[type="checkbox"] {
-      width: auto;
-      margin-right: 5px;
-      vertical-align: middle;
-    }
-
-    /* Style supplémentaire pour afficher les options comme un mini panneau */
     .option-group {
       background: #ffffffaa;
       padding: 10px;
       border-radius: 8px;
       margin-bottom: 10px;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .counter {
+      text-align: center;
+      margin-top: 10px;
+      font-weight: bold;
+      font-size: 1em;
+      background: #ffffffaa;
+      padding: 10px;
+      border-radius: 8px;
       box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
     }
   </style>
@@ -85,7 +84,7 @@
   <h1>Options Écologiques</h1>
 
   <div class="option-group">
-    <label for="visibleQuality">Qualité par défaut (onglet visible):</label>
+    <label for="visibleQuality">Default quality (visible tab):</label>
     <select id="visibleQuality">
       <option value="Auto">Auto</option>
       <option value="144p">144p</option>
@@ -96,7 +95,7 @@
       <option value="1080p">1080p</option>
     </select>
 
-    <label for="hiddenQuality">Qualité par défaut (onglet caché):</label>
+    <label for="hiddenQuality">Default quality (hidden tab):</label>
     <select id="hiddenQuality">
       <option value="144p">144p</option>
       <option value="240p">240p</option>
@@ -109,7 +108,11 @@
     </label>
   </div>
 
-  <a href="https://www.monsite-invente.com" target="_blank">Visiter le site de l'application</a>
+  <a href="https://www.monsite.com" target="_blank">Visit website</a>
+
+  <div class="counter">
+    Saved datas : <span id="dataCounter">0</span>
+  </div>
 
   <script src="popup.js"></script>
 </body>
