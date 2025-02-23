@@ -5,18 +5,24 @@ document.addEventListener('visibilitychange', () => {
       hiddenQuality: '144p'
     },
     (items) => {
-      if (document.hidden) {
+      if (document.hidden)
+      {
         setPlayerQuality(items.hiddenQuality);
-      } else {
+      }
+
+      else
+      {
         setPlayerQuality(items.visibleQuality);
       }
     }
   );
 });
 
-function setPlayerQuality(targetQuality) {
+function setPlayerQuality(targetQuality)
+{
   const settingsButton = document.querySelector('.ytp-settings-button');
-  if (settingsButton) {
+  if (settingsButton)
+  {
     settingsButton.click();
     setTimeout(() => {
       const menuItems = document.querySelectorAll('.ytp-menuitem-label');
@@ -34,20 +40,28 @@ function setPlayerQuality(targetQuality) {
           // Rechercher l'item qui contient la chaine targetQuality
           let desired = null;
 
-          if (targetQuality.toLowerCase() === 'auto') {
+          if (targetQuality.toLowerCase() === 'auto')
+          {
             desired = Array.from(qualities).find(q =>
               q.textContent.trim().toLowerCase().includes('auto')
             );
-          } else {
+          }
+
+          else
+          {
             desired = Array.from(qualities).find(q =>
               q.textContent.trim().toLowerCase().includes(targetQuality.toLowerCase())
             );
           }
 
-          if (desired) {
+          if (desired)
+          {
             desired.click();
             finalQuality = desired.textContent.trim();
-          } else {
+          }
+          
+          else
+          {
             // Si la qualité souhaitée n'est pas trouvée, on prend la plus basse
             const lowest = qualities[qualities.length - 1];
             if (lowest) {
@@ -59,7 +73,8 @@ function setPlayerQuality(targetQuality) {
           console.log(`Qualité réglée sur : ${finalQuality}`);
 
           chrome.storage.sync.get({ notificationsEnabled: true }, (items) => {
-            if (items.notificationsEnabled) {
+            if (items.notificationsEnabled)
+            {
               chrome.runtime.sendMessage({type: "qualityChanged", quality: finalQuality});
             }
           });
@@ -67,7 +82,10 @@ function setPlayerQuality(targetQuality) {
         }, 500);
       }
     }, 500);
-  } else {
+  }
+  
+  else
+  {
     console.log('Bouton paramètres non trouvé, impossible de changer la qualité.');
   }
 }

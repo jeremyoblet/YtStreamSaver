@@ -1,11 +1,14 @@
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === "qualityChanged") {
+  if (message.type === "qualityChanged")
+  {
     showNotification(message.quality);
   }
 });
 
-function showNotification(quality) {
-  chrome.notifications.create({
+function showNotification(quality)
+{
+  chrome.notifications.create(
+  {
     type: 'basic',
     iconUrl: 'icon.png',
     title: 'Quality changed',
