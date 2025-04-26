@@ -70,7 +70,7 @@ function setPlayerQuality(targetQuality)
             }
           }
 
-          console.log(`Qualité réglée sur : ${finalQuality}`);
+          console.log(`Current quality : ${finalQuality}`);
 
           chrome.storage.sync.get({ notificationsEnabled: true }, (items) => {
             if (items.notificationsEnabled)
@@ -86,6 +86,6 @@ function setPlayerQuality(targetQuality)
   
   else
   {
-    console.log('Bouton paramètres non trouvé, impossible de changer la qualité.');
+    console.log('Seetings button not found. Quality not changed.');
   }
 }
