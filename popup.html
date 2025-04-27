@@ -8,15 +8,31 @@
 </head>
 <body>
     <div class="container">
-        <h1>EcoStream</h1>
+        <h1>Yt Stream Saver</h1>
+
+        <div class="option-card">
+            <h2>Enable extension</h2>
+            <div class="toggle-container">
+                <label class="switch">
+                    <input type="checkbox" id="extensionEnabled" />
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
 
         <div class="option-card">
             <div class="option-group">
                 <label for="hiddenQuality">Min quality</label>
                 <select id="hiddenQuality">
-                    <option value="144p">144p</option>
-                    <option value="240p">240p</option>
-                    <option value="360p">360p</option>
+                    <option value="144">144p</option>
+                    <option value="240">240p</option>
+                    <option value="360">360p</option>
+                    <option value="480">480p</option>
+                    <option value="720">720p</option>
+                    <option value="1080">1080p</option>
+                    <option value="1440">1440p</option>
+                    <option value="2160">2016p</option>
+                    <option value="4320">4320p</option>
                 </select>
 
                 <label for="visibleQuality">Max quality</label>
@@ -28,6 +44,9 @@
                     <option value="480">480p</option>
                     <option value="720">720p</option>
                     <option value="1080">1080p</option>
+                    <option value="1440">1440p</option>
+                    <option value="2160">2016p</option>
+                    <option value="4320">4320p</option>
                 </select>
             </div>
         </div>
