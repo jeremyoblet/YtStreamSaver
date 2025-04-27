@@ -2,7 +2,7 @@ document.addEventListener('visibilitychange', () => {
   chrome.storage.sync.get(
     {
       visibleQuality: 'Auto',
-      hiddenQuality: '144p'
+      hiddenQuality: '144'
     },
     (items) => {
       if (document.hidden)
@@ -51,38 +51,67 @@ function openQualityMenu(callback) {
   }
 }
 
+function extractResolution(text) {
+  const match = text.match(/(\d+)p/);
+  return match ? parseInt(match[1], 10) : null;
+}
+
 function selectQuality(targetQuality, callback) {
   const qualities = document.querySelectorAll('.ytp-quality-menu .ytp-menuitem-label');
 
   console.log("Qualités disponibles :");
-  Array.from(qualities).forEach(q => console.log(q.textContent.trim()));
+  const qualityList = Array.from(qualities).map(q => ({
+    element: q,
+    label: q.textContent.trim(),
+    resolution: extractResolution(q.textContent.trim()),
+    isPremium: q.textContent.toLowerCase().includes('premium')
+  }));
 
-  let desired = null;
-  if (targetQuality.toLowerCase() === 'auto') {
-    desired = Array.from(qualities).find(q =>
-      q.textContent.trim().toLowerCase().includes('auto')
-    );
-  } else {
-    desired = Array.from(qualities).find(q =>
-      q.textContent.trim().toLowerCase().includes(targetQuality.toLowerCase())
-    );
-  }
+  qualityList.forEach(q => console.log(q.label));
 
   let finalQuality = targetQuality;
 
-  if (desired) {
-    desired.click();
-    finalQuality = desired.textContent.trim();
+  if (targetQuality.toLowerCase() === 'auto') {
+    const autoQuality = qualityList.find(q => q.label.toLowerCase().includes('auto'));
+    if (autoQuality) {
+      autoQuality.element.click();
+      finalQuality = autoQuality.label;
+    }
   } else {
-    const lowest = qualities[qualities.length - 1];
-    if (lowest) {
-      lowest.click();
-      finalQuality = lowest.textContent.trim();
+    const targetResolution = parseInt(targetQuality, 10);
+
+    // Cherche d'abord un match exact sans premium
+    let exactMatch = qualityList.find(q => q.resolution === targetResolution && !q.isPremium);
+
+    // Si pas trouvé, prend la version premium si nécessaire (dernier recours)
+    if (!exactMatch) {
+      exactMatch = qualityList.find(q => q.resolution === targetResolution);
+    }
+
+    if (exactMatch && !exactMatch.isPremium) {
+      exactMatch.element.click();
+      finalQuality = exactMatch.label;
+    } else {
+      // Sinon, cherche la meilleure qualité inférieure sans premium
+      const lowerQualities = qualityList
+        .filter(q => q.resolution !== null && q.resolution <= targetResolution && !q.isPremium)
+        .sort((a, b) => b.resolution - a.resolution); // Descendant
+
+      if (lowerQualities.length > 0) {
+        lowerQualities[0].element.click();
+        finalQuality = lowerQualities[0].label;
+      } else {
+        // Dernier recours : qualité la plus basse dispo, même premium
+        const lowest = qualityList[qualityList.length - 1];
+        if (lowest) {
+          lowest.element.click();
+          finalQuality = lowest.label;
+        }
+      }
     }
   }
 
-  console.log(`Current quality: ${finalQuality}`);
-
+  console.log(`Qualité sélectionnée : ${finalQuality}`);
   callback(finalQuality);
 }
 

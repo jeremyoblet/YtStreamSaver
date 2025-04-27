@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   chrome.storage.sync.get(
     {
       visibleQuality: 'Auto',
-      hiddenQuality: '144p',
+      hiddenQuality: '144',
       notificationsEnabled: true
     },
     (items) => {
