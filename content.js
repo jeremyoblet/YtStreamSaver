@@ -1,4 +1,5 @@
 let currentTabId = null;
+let visibilityListenerActive = false;
 
 // Demander le tabId au background
 function initTab() {
@@ -6,18 +7,39 @@ function initTab() {
     if (response && response.tabId !== undefined) {
       currentTabId = response.tabId;
       console.log("Tab ID initialisé via background:", currentTabId);
-      setupVisibilityListener();
+      setupExtensionBehavior();
     } else {
       console.error("Impossible d'obtenir le Tab ID.");
     }
   });
 }
 
-function setupVisibilityListener() {
-  document.removeEventListener('visibilitychange', onVisibilityChange);
-  document.addEventListener('visibilitychange', onVisibilityChange);
+// Fonction pour lire si l'extension est activée
+async function isExtensionEnabled() {
+  const { extensionEnabled } = await chrome.storage.sync.get({ extensionEnabled: true });
+  return extensionEnabled;
 }
 
+// Installer ou retirer le listener selon l'état de l'extension
+async function setupExtensionBehavior() {
+  const enabled = await isExtensionEnabled();
+  updateVisibilityListener(enabled);
+}
+
+// Ajouter ou enlever le listener proprement
+function updateVisibilityListener(enabled) {
+  if (enabled && !visibilityListenerActive) {
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    visibilityListenerActive = true;
+    console.log("Listener visibilitychange activé.");
+  } else if (!enabled && visibilityListenerActive) {
+    document.removeEventListener('visibilitychange', onVisibilityChange);
+    visibilityListenerActive = false;
+    console.log("Listener visibilitychange désactivé.");
+  }
+}
+
+// Quand la visibilité change
 async function onVisibilityChange() {
   if (currentTabId === null) {
     console.error("Tab ID non initialisé.");
@@ -27,7 +49,6 @@ async function onVisibilityChange() {
   const isVisible = !document.hidden;
 
   if (isVisible) {
-    // Si on devient visible, on demande au background si on est maître
     chrome.runtime.sendMessage({
       type: 'updateVisibility',
       tabId: currentTabId,
@@ -41,10 +62,8 @@ async function onVisibilityChange() {
       }
     });
   } else {
-    // Si on devient caché, on force directement la qualité basse
     console.log("Je passe caché, je change directement la qualité (Hidden).");
     changeQualityBasedOnVisibility(false);
-    // Et on avertit quand même le background
     chrome.runtime.sendMessage({
       type: 'updateVisibility',
       tabId: currentTabId,
@@ -53,7 +72,7 @@ async function onVisibilityChange() {
   }
 }
 
-
+// Changer la qualité selon visible/caché
 async function changeQualityBasedOnVisibility(isVisible) {
   const { visibleQuality = 'Auto', hiddenQuality = '144' } = await chrome.storage.sync.get({
     visibleQuality: 'Auto',
@@ -66,6 +85,7 @@ async function changeQualityBasedOnVisibility(isVisible) {
   setPlayerQuality(targetQuality);
 }
 
+// Fonctions existantes inchangées (setPlayerQuality, openSettingsMenu, openQualityMenu, etc.)
 function setPlayerQuality(targetQuality) {
   const settingsButton = document.querySelector('.ytp-settings-button');
   if (!settingsButton) {
@@ -172,7 +192,6 @@ function notifyQualityChange(finalQuality) {
   });
 }
 
-
 function waitForPlayerReady(callback) {
   const checkExist = setInterval(() => {
     const player = document.querySelector('.html5-video-player');
@@ -196,4 +215,13 @@ window.addEventListener('yt-navigate-finish', () => {
     console.log('Player prêt après navigation.');
     initTab();
   });
+});
+
+// 🔥 BONUS : Ecouter les changements d'activation en live
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'sync' && changes.extensionEnabled) {
+    const enabled = changes.extensionEnabled.newValue;
+    console.log(`extensionEnabled changé dynamiquement : ${enabled}`);
+    updateVisibilityListener(enabled);
+  }
 });
