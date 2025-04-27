@@ -1,4 +1,4 @@
-let tabStates = {}; // Stocké en RAM pour chaque onglet
+let tabStates = {};
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log("Message reçu dans background :", message);
@@ -44,8 +44,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   // Réagir au changement de qualité pour afficher une notification
   if (message.type === 'qualityChanged') {
-    showNotification(message.quality);
-  }
+    showNotification(message.quality, message.tabInfo);
+  }  
 
   // Permettre de récupérer les tabStates pour debug
   if (message.type === 'getTabStates') {
@@ -54,19 +54,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
-// Fonction d'affichage de la notification
-function showNotification(quality) {
+function showNotification(quality, tabInfo) {
+  const title = tabInfo?.title || "YouTube Tab";
   chrome.notifications.create(
     {
       type: 'basic',
       iconUrl: 'icon.png',
-      title: 'Quality Changed',
-      message: `${quality}`
-    },
+      title: `Quality Changed`,
+      message: `${quality} on ${title}`
+    }, 
     (notificationId) => {
       setTimeout(() => {
         chrome.notifications.clear(notificationId);
-      }, 2000);
+      }, 3000);
     }
   );
 }

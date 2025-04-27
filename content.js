@@ -1,5 +1,3 @@
-// content.js
-
 let currentTabId = null;
 
 // Demander le tabId au background
@@ -162,10 +160,18 @@ function selectQuality(targetQuality, callback) {
 function notifyQualityChange(finalQuality) {
   chrome.storage.sync.get({ notificationsEnabled: true }, (items) => {
     if (items.notificationsEnabled) {
-      chrome.runtime.sendMessage({ type: "qualityChanged", quality: finalQuality });
+      chrome.runtime.sendMessage({
+        type: "qualityChanged",
+        quality: finalQuality,
+        tabInfo: {
+          url: window.location.href,
+          title: document.title
+        }
+      });
     }
   });
 }
+
 
 function waitForPlayerReady(callback) {
   const checkExist = setInterval(() => {
