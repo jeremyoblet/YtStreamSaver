@@ -1,33 +1,26 @@
-document.addEventListener('visibilitychange', () => {
-  chrome.storage.sync.get(
-    {
-      visibleQuality: 'Auto',
-      hiddenQuality: '144'
-    },
-    (items) => {
-      if (document.hidden)
-      {
-        setPlayerQuality(items.hiddenQuality);
-      }
+document.addEventListener('visibilitychange', async () => {
+  const { visibleQuality = 'Auto', hiddenQuality = '144' } = await chrome.storage.sync.get({
+    visibleQuality: 'Auto',
+    hiddenQuality: '144'
+  });
 
-      else
-      {
-        setPlayerQuality(items.visibleQuality);
-      }
-    }
-  );
+  const targetQuality = document.hidden ? hiddenQuality : visibleQuality;
+
+  console.log(`Demande de qualité : ${targetQuality}`);
+  
+  setPlayerQuality(targetQuality);
 });
 
-function setPlayerQuality(targetQuality) {
+async function setPlayerQuality(targetQuality) {
   const settingsButton = document.querySelector('.ytp-settings-button');
   if (!settingsButton) {
-    console.log('Settings button not found. Quality not changed.');
+    console.log('Settings button not found.');
     return;
   }
 
-  openSettingsMenu(settingsButton, () => {
-    openQualityMenu(() => {
-      selectQuality(targetQuality, (finalQuality) => {
+  openSettingsMenu(settingsButton, async () => {
+    await openQualityMenu(async () => {
+      await selectQuality(targetQuality, (finalQuality) => {
         notifyQualityChange(finalQuality);
       });
     });
@@ -56,7 +49,7 @@ function extractResolution(text) {
   return match ? parseInt(match[1], 10) : null;
 }
 
-function selectQuality(targetQuality, callback) {
+async function selectQuality(targetQuality, callback) {
   const qualities = document.querySelectorAll('.ytp-quality-menu .ytp-menuitem-label');
 
   console.log("Qualités disponibles :");
@@ -80,10 +73,10 @@ function selectQuality(targetQuality, callback) {
   } else {
     const targetResolution = parseInt(targetQuality, 10);
 
-    // Cherche d'abord un match exact sans premium
+    // Cherche un match exact sans premium
     let exactMatch = qualityList.find(q => q.resolution === targetResolution && !q.isPremium);
 
-    // Si pas trouvé, prend la version premium si nécessaire (dernier recours)
+    // Sinon accepte premium
     if (!exactMatch) {
       exactMatch = qualityList.find(q => q.resolution === targetResolution);
     }
@@ -92,16 +85,16 @@ function selectQuality(targetQuality, callback) {
       exactMatch.element.click();
       finalQuality = exactMatch.label;
     } else {
-      // Sinon, cherche la meilleure qualité inférieure sans premium
+      // Cherche la meilleure qualité inférieure sans premium
       const lowerQualities = qualityList
         .filter(q => q.resolution !== null && q.resolution <= targetResolution && !q.isPremium)
-        .sort((a, b) => b.resolution - a.resolution); // Descendant
+        .sort((a, b) => b.resolution - a.resolution);
 
       if (lowerQualities.length > 0) {
         lowerQualities[0].element.click();
         finalQuality = lowerQualities[0].label;
       } else {
-        // Dernier recours : qualité la plus basse dispo, même premium
+        // Dernier recours
         const lowest = qualityList[qualityList.length - 1];
         if (lowest) {
           lowest.element.click();
