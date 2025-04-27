@@ -1,26 +1,70 @@
-document.addEventListener('visibilitychange', async () => {
+// content.js
+
+let currentTabId = null;
+
+// Demander le tabId au background
+function initTab() {
+  chrome.runtime.sendMessage({ type: "getTabId" }, (response) => {
+    if (response && response.tabId !== undefined) {
+      currentTabId = response.tabId;
+      console.log("Tab ID initialisé via background:", currentTabId);
+      setupVisibilityListener();
+    } else {
+      console.error("Impossible d'obtenir le Tab ID.");
+    }
+  });
+}
+
+function setupVisibilityListener() {
+  document.removeEventListener('visibilitychange', onVisibilityChange);
+  document.addEventListener('visibilitychange', onVisibilityChange);
+}
+
+async function onVisibilityChange() {
+  if (currentTabId === null) {
+    console.error("Tab ID non initialisé.");
+    return;
+  }
+
+  const isVisible = !document.hidden;
+
+  chrome.runtime.sendMessage({
+    type: 'updateVisibility',
+    tabId: currentTabId,
+    visible: isVisible
+  }, (response) => {
+    if (response && response.isMaster) {
+      console.log("Je suis maître, je change la qualité.");
+      changeQualityBasedOnVisibility(isVisible);
+    } else {
+      console.log("Un autre onglet est maître ou pas de réponse.");
+    }
+  });
+}
+
+async function changeQualityBasedOnVisibility(isVisible) {
   const { visibleQuality = 'Auto', hiddenQuality = '144' } = await chrome.storage.sync.get({
     visibleQuality: 'Auto',
     hiddenQuality: '144'
   });
 
-  const targetQuality = document.hidden ? hiddenQuality : visibleQuality;
+  const targetQuality = isVisible ? visibleQuality : hiddenQuality;
 
-  console.log(`Demande de qualité : ${targetQuality}`);
-  
+  console.log(`Changement demandé vers : ${targetQuality}`);
   setPlayerQuality(targetQuality);
-});
+}
 
-async function setPlayerQuality(targetQuality) {
+function setPlayerQuality(targetQuality) {
   const settingsButton = document.querySelector('.ytp-settings-button');
   if (!settingsButton) {
     console.log('Settings button not found.');
     return;
   }
 
-  openSettingsMenu(settingsButton, async () => {
-    await openQualityMenu(async () => {
-      await selectQuality(targetQuality, (finalQuality) => {
+  openSettingsMenu(settingsButton, () => {
+    openQualityMenu(() => {
+      selectQuality(targetQuality, (finalQuality) => {
+        console.log('Qualité forcée:', finalQuality);
         notifyQualityChange(finalQuality);
       });
     });
@@ -37,10 +81,11 @@ function openQualityMenu(callback) {
   const qualityItem = Array.from(menuItems).find(el => el.textContent.toLowerCase().includes('qualit'));
 
   if (qualityItem) {
+    console.log('Item Qualité trouvé.');
     qualityItem.click();
     setTimeout(callback, 500);
   } else {
-    console.log('Quality menu item not found.');
+    console.log('Item Qualité non trouvé.');
   }
 }
 
@@ -49,18 +94,15 @@ function extractResolution(text) {
   return match ? parseInt(match[1], 10) : null;
 }
 
-async function selectQuality(targetQuality, callback) {
+function selectQuality(targetQuality, callback) {
   const qualities = document.querySelectorAll('.ytp-quality-menu .ytp-menuitem-label');
 
-  console.log("Qualités disponibles :");
   const qualityList = Array.from(qualities).map(q => ({
     element: q,
     label: q.textContent.trim(),
     resolution: extractResolution(q.textContent.trim()),
     isPremium: q.textContent.toLowerCase().includes('premium')
   }));
-
-  qualityList.forEach(q => console.log(q.label));
 
   let finalQuality = targetQuality;
 
@@ -73,10 +115,8 @@ async function selectQuality(targetQuality, callback) {
   } else {
     const targetResolution = parseInt(targetQuality, 10);
 
-    // Cherche un match exact sans premium
     let exactMatch = qualityList.find(q => q.resolution === targetResolution && !q.isPremium);
 
-    // Sinon accepte premium
     if (!exactMatch) {
       exactMatch = qualityList.find(q => q.resolution === targetResolution);
     }
@@ -85,7 +125,6 @@ async function selectQuality(targetQuality, callback) {
       exactMatch.element.click();
       finalQuality = exactMatch.label;
     } else {
-      // Cherche la meilleure qualité inférieure sans premium
       const lowerQualities = qualityList
         .filter(q => q.resolution !== null && q.resolution <= targetResolution && !q.isPremium)
         .sort((a, b) => b.resolution - a.resolution);
@@ -94,7 +133,6 @@ async function selectQuality(targetQuality, callback) {
         lowerQualities[0].element.click();
         finalQuality = lowerQualities[0].label;
       } else {
-        // Dernier recours
         const lowest = qualityList[qualityList.length - 1];
         if (lowest) {
           lowest.element.click();
@@ -104,7 +142,6 @@ async function selectQuality(targetQuality, callback) {
     }
   }
 
-  console.log(`Qualité sélectionnée : ${finalQuality}`);
   callback(finalQuality);
 }
 
@@ -115,3 +152,28 @@ function notifyQualityChange(finalQuality) {
     }
   });
 }
+
+function waitForPlayerReady(callback) {
+  const checkExist = setInterval(() => {
+    const player = document.querySelector('.html5-video-player');
+    if (player && player.getPlayerState) {
+      clearInterval(checkExist);
+      callback();
+    }
+  }, 500);
+}
+
+// Initialisation
+initTab();
+waitForPlayerReady(() => {
+  console.log('Player prêt');
+});
+
+// Surveiller les navigations internes
+window.addEventListener('yt-navigate-finish', () => {
+  console.log('Navigation interne détectée (yt-navigate-finish)');
+  waitForPlayerReady(() => {
+    console.log('Player prêt après navigation.');
+    initTab();
+  });
+});
