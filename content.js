@@ -28,19 +28,33 @@ async function onVisibilityChange() {
 
   const isVisible = !document.hidden;
 
-  chrome.runtime.sendMessage({
-    type: 'updateVisibility',
-    tabId: currentTabId,
-    visible: isVisible
-  }, (response) => {
-    if (response && response.isMaster) {
-      console.log("Je suis maître, je change la qualité.");
-      changeQualityBasedOnVisibility(isVisible);
-    } else {
-      console.log("Un autre onglet est maître ou pas de réponse.");
-    }
-  });
+  if (isVisible) {
+    // Si on devient visible, on demande au background si on est maître
+    chrome.runtime.sendMessage({
+      type: 'updateVisibility',
+      tabId: currentTabId,
+      visible: true
+    }, (response) => {
+      if (response && response.isMaster) {
+        console.log("Je suis maître, je change la qualité (Visible).");
+        changeQualityBasedOnVisibility(true);
+      } else {
+        console.log("Un autre onglet est maître ou pas de réponse (Visible).");
+      }
+    });
+  } else {
+    // Si on devient caché, on force directement la qualité basse
+    console.log("Je passe caché, je change directement la qualité (Hidden).");
+    changeQualityBasedOnVisibility(false);
+    // Et on avertit quand même le background
+    chrome.runtime.sendMessage({
+      type: 'updateVisibility',
+      tabId: currentTabId,
+      visible: false
+    });
+  }
 }
+
 
 async function changeQualityBasedOnVisibility(isVisible) {
   const { visibleQuality = 'Auto', hiddenQuality = '144' } = await chrome.storage.sync.get({
