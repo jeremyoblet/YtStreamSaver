@@ -1,67 +1,69 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EcoStream 🌱</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Youtube stream saver 🌱</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Yt Stream Saver</h1>
+  <div class="container">
+    <h1>Youtube Stream Saver</h1>
 
-        <div class="option-card">
-            <h2>Enable extension</h2>
-            <div class="toggle-container">
-                <label class="switch">
-                    <input type="checkbox" id="extensionEnabled" />
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </div>
-
-        <div class="option-card">
-            <div class="option-group">
-                <label for="hiddenQuality">Min quality</label>
-                <select id="hiddenQuality">
-                    <option value="144">144p</option>
-                    <option value="240">240p</option>
-                    <option value="360">360p</option>
-                    <option value="480">480p</option>
-                    <option value="720">720p</option>
-                    <option value="1080">1080p</option>
-                    <option value="1440">1440p</option>
-                    <option value="2160">2016p</option>
-                    <option value="4320">4320p</option>
-                </select>
-
-                <label for="visibleQuality">Max quality</label>
-                <select id="visibleQuality">
-                    <option value="Auto">Auto</option>
-                    <option value="144">144p</option>
-                    <option value="240">240p</option>
-                    <option value="360">360p</option>
-                    <option value="480">480p</option>
-                    <option value="720">720p</option>
-                    <option value="1080">1080p</option>
-                    <option value="1440">1440p</option>
-                    <option value="2160">2016p</option>
-                    <option value="4320">4320p</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="option-card">
-            <h2>Notifications</h2>
-            <div class="toggle-container">
-                <label class="switch">
-                    <input type="checkbox" id="notificationsEnabled" />
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </div>
+    <div class="option-card">
+      <div class="option-line">
+        <label for="extensionEnabled" class="option-label">Enabled</label>
+        <label class="switch">
+          <input type="checkbox" id="extensionEnabled" />
+          <span class="slider"></span>
+        </label>
+      </div>
     </div>
 
-    <script src="popup.js"></script>
+    <div class="option-card">
+      <div class="option-line">
+        <label for="hiddenQuality" class="option-label">Min quality</label>
+        <select id="hiddenQuality">
+          <option value="144">144p</option>
+          <option value="240">240p</option>
+          <option value="360">360p</option>
+          <option value="480">480p</option>
+          <option value="720">720p</option>
+          <option value="1080">1080p</option>
+          <option value="1440">1440p</option>
+          <option value="2160">2160p</option>
+          <option value="4320">4320p</option>
+        </select>
+      </div>
+
+      <div class="option-line">
+        <label for="visibleQuality" class="option-label">Max quality</label>
+        <select id="visibleQuality">
+          <option value="Auto">Auto</option>
+          <option value="144">144p</option>
+          <option value="240">240p</option>
+          <option value="360">360p</option>
+          <option value="480">480p</option>
+          <option value="720">720p</option>
+          <option value="1080">1080p</option>
+          <option value="1440">1440p</option>
+          <option value="2160">2160p</option>
+          <option value="4320">4320p</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="option-card">
+      <div class="option-line">
+        <label for="notificationsEnabled" class="option-label">Notifications</label>
+        <label class="switch">
+          <input type="checkbox" id="notificationsEnabled" />
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
 </body>
 </html>

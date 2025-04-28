@@ -1,22 +1,17 @@
-/* 🌿 Global */
 body {
     font-family: "Founders Grotesk", "Roboto", sans-serif;
-    background: #1B1B1B; /* Fond noir profond */
-    color: #FFFFFF; /* Texte blanc */
+    background: #1B1B1B;
+    color: #FFFFFF;
     text-align: center;
-    padding: 20px;
-    max-width: 320px;
     margin: auto;
+    min-width: 250px;
 }
 
-/* 🌍 Container */
 .container {
-    background: #1B1B1B; /* Même fond que body pour un design plat */
-    border-radius: 12px;
-    padding: 20px;
+    background: #1B1B1B;
+    margin: 5px;
 }
 
-/* 🏷️ Titres */
 h1 {
     font-size: 24px;
     margin-bottom: 15px;
@@ -30,27 +25,22 @@ h2 {
     margin-bottom: 10px;
 }
 
-/* 📦 Cartes */
 .option-card {
-    background: #2B2B2B; /* Un gris légèrement plus clair pour les cartes */
+    background: #2B2B2B;
     border-radius: 8px;
     padding: 15px;
-    margin-bottom: 15px;
+    margin-bottom: 5px;
 }
 
-/* 📌 Labels */
 label {
     font-size: 14px;
     color: #FFFFFF;
     display: block;
-    margin-bottom: 5px;
     text-align: left;
 }
 
-/* 📑 Sélecteurs */
 select {
-    width: 100%;
-    padding: 8px;
+    padding: 5px;
     border-radius: 6px;
     border: 1px solid #4CAF50;
     background: #1B1B1B;
@@ -63,7 +53,6 @@ select:hover {
     background: #2B2B2B;
 }
 
-/* 🎚️ Switch */
 .switch {
     position: relative;
     display: inline-block;
@@ -115,7 +104,6 @@ input:checked + .slider:before {
     margin-left: 10px;
 }
 
-/* 📊 Stats */
 .stats {
     font-size: 13px;
     color: #FFFFFF;
@@ -126,7 +114,6 @@ input:checked + .slider:before {
     border-radius: 6px;
 }
 
-/* 🟢 Bouton */
 button {
     background: #4CAF50;
     color: #1B1B1B;
@@ -141,5 +128,17 @@ button {
 }
 
 button:hover {
-    background: #45A049; /* Légèrement plus foncé au hover */
+    background: #45A049;
 }
+
+.option-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .option-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #FFFFFF;
+  }
