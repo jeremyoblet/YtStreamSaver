@@ -59,7 +59,7 @@ function showNotification(quality, tabInfo) {
   chrome.notifications.create(
     {
       type: 'basic',
-      iconUrl: 'icon.png',
+      iconUrl: 'notification_icon.png',
       title: `Quality Changed`,
       message: `${quality} on ${title}`
     }, 
