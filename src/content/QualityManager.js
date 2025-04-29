@@ -1,4 +1,3 @@
-// src/content/QualityManager.js
 import { getExtensionEnabled, getVisibleQuality, getHiddenQuality } from './utils/storageUtils.js';
 
 export class QualityManager {

@@ -1,5 +1,3 @@
-// src/content/VisibilityListener.js
-
 export class VisibilityListener {
     constructor(tabManager, qualityManager) {
       this.tabManager = tabManager;
@@ -8,7 +6,7 @@ export class VisibilityListener {
     }
   
     init() {
-      this.updateVisibilityListener(true); // Toujours actif au début
+      this.updateVisibilityListener(true);
     }
   
     updateVisibilityListener(enabled) {

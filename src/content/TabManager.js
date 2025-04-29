@@ -1,6 +1,3 @@
-// src/content/TabManager.js
-import { getExtensionEnabled } from './utils/storageUtils.js';
-
 export class TabManager {
   constructor() {
     this.currentTabId = null;

@@ -1,4 +1,3 @@
-// src/content/mainContent.js
 import { TabManager } from './TabManager.js';
 import { QualityManager } from './QualityManager.js';
 import { VisibilityListener } from './VisibilityListener.js';
