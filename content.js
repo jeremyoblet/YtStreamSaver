@@ -14,6 +14,15 @@ function initTab() {
   });
 }
 
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === 'refreshQuality') {
+    console.log('Message refreshQuality reçu.');
+    const isVisible = !document.hidden;
+    changeQualityBasedOnVisibility(isVisible);
+  }
+});
+
 // Fonction pour lire si l'extension est activée
 async function isExtensionEnabled() {
   const { extensionEnabled } = await chrome.storage.sync.get({ extensionEnabled: true });
