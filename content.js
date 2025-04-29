@@ -14,12 +14,17 @@ function initTab() {
   });
 }
 
-
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'refreshQuality') {
     console.log('Message refreshQuality reçu.');
-    const isVisible = !document.hidden;
-    changeQualityBasedOnVisibility(isVisible);
+    isExtensionEnabled().then((enabled) => {
+      if (enabled) {
+        const isVisible = !document.hidden;
+        changeQualityBasedOnVisibility(isVisible);
+      } else {
+        console.log('Extension désactivée, aucun changement de qualité.');
+      }
+    });
   }
 });
 
@@ -56,6 +61,12 @@ async function onVisibilityChange() {
   }
 
   const isVisible = !document.hidden;
+
+  const enabled = await isExtensionEnabled();
+  if (!enabled) {
+    console.log("Extension désactivée, aucun changement sur visibilitychange.");
+    return;
+  }
 
   if (isVisible) {
     chrome.runtime.sendMessage({
