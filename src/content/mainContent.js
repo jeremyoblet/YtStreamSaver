@@ -1,10 +1,9 @@
-import { TabManager } from './TabManager.js';
-import { QualityManager } from './QualityManager.js';
-import { VisibilityListener } from './VisibilityListener.js';
+import { TabManager } from "./TabManager.js";
+import { QualityManager } from "./QualityManager.js";
+import { VisibilityListener } from "./VisibilityListener.js";
 
-console.log('YT Stream Saver - Content script démarré');
+console.log("YT Stream Saver - Content script démarré");
 
-// Initialisation
 const tabManager = new TabManager();
 const qualityManager = new QualityManager(tabManager);
 const visibilityListener = new VisibilityListener(tabManager, qualityManager);

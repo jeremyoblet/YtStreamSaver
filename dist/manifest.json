@@ -1,24 +1,22 @@
 {
+  "name": "YouTube Quality optimizer",
+  "version": "1.1",
   "manifest_version": 3,
-  "name": "Yt Stream Saver",
-  "version": "1.0",
   "description": "Notify Youtube videos qualities when the tab or Chrome are hidden",
   "permissions": [
     "notifications",
     "storage",
     "tabs"
   ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "content_scripts": [
     {
       "matches": ["*://www.youtube.com/watch*"],
-      "js": ["content.js"],
-      "run_at": "document_idle"
+      "js": ["content.js"]
     }
   ],
-  "background": {
-    "service_worker": "background.js",
-    "type": "module"
-  },
   "action": {
     "default_popup": "popup.html",
     "default_icon": "icons/icon.png"
