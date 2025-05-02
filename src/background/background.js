@@ -32,6 +32,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
+  if (message.type === "qualityChanged") {
+    storage
+      .readSettingFromStorage("notificationsEnabled", true)
+      .then((enabled) => {
+        if (enabled) {
+          showNotification(message.quality);
+        }
+      });
+  }
+
   // if (message.type === "notifyTabsQualityChanged") {
   //   chrome.tabs.query({ url: "*://www.youtube.com/watch*" }, (tabs) => {
   //     tabs.forEach((tab) => {
@@ -54,3 +64,19 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     });
   }
 });
+
+function showNotification(quality) {
+  chrome.notifications.create(
+    {
+      type: "basic",
+      iconUrl: "icon.png",
+      title: "Quality changed",
+      message: `${quality}`,
+    },
+    (notificationId) => {
+      setTimeout(() => {
+        chrome.notifications.clear(notificationId);
+      }, 2000);
+    }
+  );
+}
