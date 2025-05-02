@@ -5,7 +5,7 @@ import path from "path";
 
 // 1. Build le content script
 await build({
-  entryPoints: ["src/content/mainContent.js"],
+  entryPoints: ["src/content/content.js"],
   bundle: true,
   outfile: "dist/content.js",
   format: "iife",

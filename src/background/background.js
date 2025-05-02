@@ -11,7 +11,7 @@ const defaultSettings = {
 
 async function initialize() {
   await storage.initializeDefaultsIfMissing(defaultSettings);
-  console.log("Réglages initiaux vérifiés.");
+  console.log("Default settings checked.");
 }
 
 initialize();
@@ -32,11 +32,25 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
-  if (message.type === "notifyTabsQualityChanged") {
-    chrome.tabs.query({ url: "*://www.youtube.com/watch*" }, (tabs) => {
-      tabs.forEach((tab) => {
-        chrome.tabs.sendMessage(tab.id, { type: "refreshQuality" });
-      });
+  // if (message.type === "notifyTabsQualityChanged") {
+  //   chrome.tabs.query({ url: "*://www.youtube.com/watch*" }, (tabs) => {
+  //     tabs.forEach((tab) => {
+  //       chrome.tabs.sendMessage(tab.id, { type: "refreshQuality" });
+  //     });
+  //   });
+  // }
+});
+
+//Allow dynamic injection on video pages ( no need to refresh page to inject content.js now )
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (
+    changeInfo.status === "complete" &&
+    tab.url &&
+    tab.url.includes("youtube.com/watch")
+  ) {
+    chrome.scripting.executeScript({
+      target: { tabId },
+      files: ["content.js"],
     });
   }
 });
