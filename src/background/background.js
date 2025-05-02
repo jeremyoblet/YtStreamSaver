@@ -42,13 +42,20 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       });
   }
 
-  // if (message.type === "notifyTabsQualityChanged") {
-  //   chrome.tabs.query({ url: "*://www.youtube.com/watch*" }, (tabs) => {
-  //     tabs.forEach((tab) => {
-  //       chrome.tabs.sendMessage(tab.id, { type: "refreshQuality" });
-  //     });
-  //   });
-  // }
+  if (message.type === "notifyTabsQualityChanged") {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const activeTab = tabs[0];
+      if (
+        activeTab &&
+        activeTab.url &&
+        activeTab.url.includes("youtube.com/watch")
+      ) {
+        chrome.tabs.sendMessage(activeTab.id, { type: "refreshQuality" });
+      } else {
+        console.log("No active tab on Youtube found.");
+      }
+    });
+  }
 });
 
 //Allow dynamic injection on video pages ( no need to refresh page to inject content.js now )

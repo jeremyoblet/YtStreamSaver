@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
           console.log("Réglage enregistré ?", response.success);
         }
       );
-      chrome.runtime.sendMessage({ type: "notifyTabsQualityChanged" });
+      // chrome.runtime.sendMessage({ type: "notifyTabsQualityChanged" });
     });
 
     notificationsCheckbox.addEventListener("change", () => {

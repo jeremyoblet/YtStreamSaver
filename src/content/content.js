@@ -2,6 +2,8 @@ import { QualitySwitcher } from "./qualitySwitcher.js";
 
 if (!window.hasRunContentScript) {
   window.hasRunContentScript = true;
+
+  // My code start
   console.log("YT Stream Saver - Content script started");
 
   const qualitySwitcher = new QualitySwitcher();
@@ -9,6 +11,17 @@ if (!window.hasRunContentScript) {
   document.addEventListener("visibilitychange", async () => {
     await qualitySwitcher.handleVisibilityChange();
   });
+
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === "refreshQuality") {
+      console.log("🔁 Message reçu : refreshQuality");
+
+      const switcher = new QualitySwitcher();
+      switcher.handleVisibilityChange();
+    }
+  });
+
+  // end of my code
 
   // Détection des changements d'URL pour YouTube SPAs
   let lastUrl = location.href;

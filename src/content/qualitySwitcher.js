@@ -34,31 +34,53 @@ export class QualitySwitcher {
     }
 
     this.openSettingsMenu(settingsButton, async () => {
-      await this.openQualityMenu(async () => {
+      try {
+        await this.waitForElement(".ytp-quality-menu", 2000);
         await this.selectQuality(targetQuality, (finalQuality) => {
           this.notifyQualityChange(finalQuality);
         });
-      });
+      } catch (err) {
+        console.warn("⏱️ Le menu qualité n'est pas apparu :", err);
+      }
     });
   }
 
   openSettingsMenu(button, callback) {
     button.click();
-    setTimeout(callback, 500);
+    setTimeout(() => {
+      const menuItems = document.querySelectorAll(".ytp-menuitem-label");
+      const qualityItem = Array.from(menuItems).find((el) =>
+        el.textContent.toLowerCase().includes("qualit")
+      );
+
+      if (qualityItem) {
+        qualityItem.click();
+        setTimeout(callback, 400); // petit délai pour laisser apparaître le menu qualité
+      } else {
+        console.log("Quality menu item not found.");
+      }
+    }, 300); // délai pour que le premier menu s'affiche
   }
 
-  openQualityMenu(callback) {
-    const menuItems = document.querySelectorAll(".ytp-menuitem-label");
-    const qualityItem = Array.from(menuItems).find((el) =>
-      el.textContent.toLowerCase().includes("qualit")
-    );
+  async waitForElement(selector, timeout = 2000) {
+    return new Promise((resolve, reject) => {
+      const interval = 100;
+      let elapsed = 0;
 
-    if (qualityItem) {
-      qualityItem.click();
-      setTimeout(callback, 500);
-    } else {
-      console.log("Quality menu item not found.");
-    }
+      const check = () => {
+        const element = document.querySelector(selector);
+        if (element) return resolve(element);
+
+        elapsed += interval;
+        if (elapsed >= timeout) {
+          return reject(`Élément "${selector}" introuvable après ${timeout}ms`);
+        }
+
+        setTimeout(check, interval);
+      };
+
+      check();
+    });
   }
 
   extractResolution(text) {
@@ -125,7 +147,7 @@ export class QualitySwitcher {
       }
     }
 
-    console.log(`Qualité sélectionnée : ${finalQuality}`);
+    console.log(`✅ Qualité sélectionnée : ${finalQuality}`);
     callback(finalQuality);
   }
 
