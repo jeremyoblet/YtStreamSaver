@@ -5,7 +5,8 @@
   "description": "Notify Youtube videos qualities when the tab or Chrome are hidden",
   "permissions": ["notifications", "storage", "tabs", "scripting"],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type": "module"
   },
   "action": {
     "default_popup": "popup.html",

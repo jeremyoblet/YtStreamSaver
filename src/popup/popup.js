@@ -4,64 +4,78 @@ document.addEventListener("DOMContentLoaded", () => {
   const hiddenSelect = document.getElementById("hiddenQuality");
   const notificationsCheckbox = document.getElementById("notificationsEnabled");
 
-  function getSettingsFromStorage() {
-    chrome.storage.sync.get(
-      {
-        extensionEnabled: true,
-        visibleQuality: "Auto",
-        hiddenQuality: "Auto",
-        notificationsEnabled: true,
-      },
-      (items) => {
-        extensionCheckbox.checked = items.extensionEnabled;
-        visibleSelect.value = items.visibleQuality;
-        hiddenSelect.value = items.hiddenQuality;
-        notificationsCheckbox.checked = items.notificationsEnabled;
-      }
-    );
-  }
-
-  function saveSettingsInStorage() {
-    chrome.storage.sync.set({
-      extensionEnabled: extensionCheckbox.checked,
-      visibleQuality: visibleSelect.value,
-      hiddenQuality: hiddenSelect.value,
-      notificationsEnabled: notificationsCheckbox.checked,
-    });
-  }
-
-  function addListenersToSettings() {
-    extensionCheckbox.addEventListener("change", () => {
-      chrome.storage.sync.set({ extensionEnabled: extensionCheckbox.checked });
-    });
-
-    visibleSelect.addEventListener("change", async () => {
-      await chrome.storage.sync.set({ visibleQuality: visibleSelect.value });
-      // notifyTabsQualityChanged();
-    });
-
-    hiddenSelect.addEventListener("change", async () => {
-      await chrome.storage.sync.set({ hiddenQuality: hiddenSelect.value });
-      // notifyTabsQualityChanged();
-    });
-
-    notificationsCheckbox.addEventListener("change", () => {
-      chrome.storage.sync.set({
-        notificationsEnabled: notificationsCheckbox.checked,
+  async function getSettingsFromBackground() {
+    return new Promise((resolve) => {
+      chrome.runtime.sendMessage({ type: "getSettings" }, (response) => {
+        resolve(response.settings);
       });
     });
   }
 
-  getSettingsFromStorage();
-  saveSettingsInStorage();
+  async function applySettingsToUI() {
+    const settings = await getSettingsFromBackground();
+    extensionCheckbox.checked = settings.extensionEnabled;
+    visibleSelect.value = settings.visibleQuality;
+    hiddenSelect.value = settings.hiddenQuality;
+    notificationsCheckbox.checked = settings.notificationsEnabled;
+  }
+
+  function addListenersToSettings() {
+    extensionCheckbox.addEventListener("change", () => {
+      chrome.runtime.sendMessage(
+        {
+          type: "updateSetting",
+          key: "extensionEnabled",
+          value: extensionCheckbox.checked,
+        },
+        (response) => {
+          console.log("Réglage enregistré ?", response.success);
+        }
+      );
+    });
+
+    visibleSelect.addEventListener("change", () => {
+      chrome.runtime.sendMessage(
+        {
+          type: "updateSetting",
+          key: "visibleQuality",
+          value: visibleSelect.value,
+        },
+        (response) => {
+          console.log("Réglage enregistré ?", response.success);
+        }
+      );
+      chrome.runtime.sendMessage({ type: "notifyTabsQualityChanged" });
+    });
+
+    hiddenSelect.addEventListener("change", () => {
+      chrome.runtime.sendMessage(
+        {
+          type: "updateSetting",
+          key: "hiddenQuality",
+          value: hiddenSelect.value,
+        },
+        (response) => {
+          console.log("Réglage enregistré ?", response.success);
+        }
+      );
+      chrome.runtime.sendMessage({ type: "notifyTabsQualityChanged" });
+    });
+
+    notificationsCheckbox.addEventListener("change", () => {
+      chrome.runtime.sendMessage(
+        {
+          type: "updateSetting",
+          key: "notificationsEnabled",
+          value: notificationsCheckbox.checked,
+        },
+        (response) => {
+          console.log("Réglage enregistré ?", response.success);
+        }
+      );
+    });
+  }
+
+  applySettingsToUI();
   addListenersToSettings();
 });
-
-// Fonction appelée lorsqu'on veut prévenir les tabs YouTube d'une mise à jour
-function notifyTabsQualityChanged() {
-  chrome.tabs.query({ url: "*://www.youtube.com/watch*" }, (tabs) => {
-    tabs.forEach((tab) => {
-      chrome.tabs.sendMessage(tab.id, { type: "refreshQuality" });
-    });
-  });
-}
