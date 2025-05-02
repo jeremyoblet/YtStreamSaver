@@ -4,7 +4,8 @@
   "description": "Notify Youtube videos qualities when the tab or Chrome are hidden",
   "type": "module",
   "scripts": {
-    "build": "node build.js"
+    "build": "node build.js",
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
@@ -18,7 +19,9 @@
   },
   "homepage": "https://github.com/jeremyoblet/YtStreamSaver#readme",
   "devDependencies": {
-    "esbuild": "^0.25.3"
+    "@eslint/js": "^9.25.1",
+    "esbuild": "^0.25.3",
+    "eslint": "^9.25.1",
+    "globals": "^16.0.0"
   }
-  
 }
