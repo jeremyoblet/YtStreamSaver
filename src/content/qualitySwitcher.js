@@ -1,7 +1,10 @@
 export class QualitySwitcher {
   async handleVisibilityChange() {
     const settings = await this.getQualitiesFromBackground();
-    if (!settings) return;
+    if (!settings || !settings.extensionEnabled) {
+      console.log("🚫 Extension disabled by user.");
+      return;
+    }
 
     const { visibleQuality = "Auto", hiddenQuality = "144" } = settings;
     const targetQuality = document.hidden ? hiddenQuality : visibleQuality;
@@ -15,7 +18,7 @@ export class QualitySwitcher {
       chrome.runtime.sendMessage({ type: "getSettings" }, (response) => {
         if (chrome.runtime.lastError || !response?.settings) {
           console.warn(
-            "Impossible de récupérer les réglages :",
+            "Impossible to get settings :",
             chrome.runtime.lastError
           );
           resolve(null);
@@ -40,7 +43,7 @@ export class QualitySwitcher {
           this.notifyQualityChange(finalQuality);
         });
       } catch (err) {
-        console.warn("⏱️ Le menu qualité n'est pas apparu :", err);
+        console.warn("⏱️ Quality menu did not appeared :", err);
       }
     });
   }
@@ -73,7 +76,7 @@ export class QualitySwitcher {
 
         elapsed += interval;
         if (elapsed >= timeout) {
-          return reject(`Élément "${selector}" introuvable après ${timeout}ms`);
+          return reject(`Element "${selector}" not found after ${timeout}ms`);
         }
 
         setTimeout(check, interval);
@@ -147,7 +150,7 @@ export class QualitySwitcher {
       }
     }
 
-    console.log(`✅ Qualité sélectionnée : ${finalQuality}`);
+    console.log(`✅ Selected quality : ${finalQuality}`);
     callback(finalQuality);
   }
 
