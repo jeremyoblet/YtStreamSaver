@@ -69,7 +69,7 @@ function showNotification(quality) {
   chrome.notifications.create(
     {
       type: "basic",
-      iconUrl: "icon.png",
+      iconUrl: "icons/icon.png",
       title: "Quality changed",
       message: `${quality}`,
     },
