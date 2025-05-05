@@ -120,7 +120,7 @@ export class QualitySwitcher {
           isPremium: this.isPremium(label),
         };
       })
-      .filter((q) => !q.isPremium); // ⚠️ On exclut TOUT de type Premium
+      .filter((q) => !q.isPremium);
 
     let finalQuality = targetQuality;
 
