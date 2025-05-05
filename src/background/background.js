@@ -1,25 +1,29 @@
 import { StorageHandler } from "./storageHandler.js";
+import { defaultSettings } from "./defaultSettings.js";
 
 const storage = new StorageHandler();
 
-const defaultSettings = {
-  extensionEnabled: true,
-  visibleQuality: "Auto",
-  hiddenQuality: "144",
-  notificationsEnabled: true,
-};
+chrome.runtime.onInstalled.addListener(async () => {
+  await initialize();
+  console.log("extension installée et paramètres initialisés");
+});
+
+chrome.runtime.onStartup.addListener(async () => {
+  await initialize();
+  console.log("extension démarrée et paramètres vérifiés");
+});
 
 async function initialize() {
   await storage.initializeDefaultsIfMissing(defaultSettings);
   console.log("Default settings checked.");
 }
 
-initialize();
-
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "getSettings") {
-    storage.readMultipleSettings(defaultSettings).then((settings) => {
-      sendResponse({ settings });
+    initialize().then(() => {
+      storage.readMultipleSettings(defaultSettings).then((settings) => {
+        sendResponse({ settings });
+      });
     });
     return true;
   }

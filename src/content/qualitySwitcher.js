@@ -1,15 +1,17 @@
 export class QualitySwitcher {
   async handleVisibilityChange() {
-    const settings = await this.getQualitiesFromBackground();
-    if (!settings || !settings.extensionEnabled) {
-      console.log("🚫 Extension disabled by user.");
+    const storedSettings = await this.getQualitiesFromBackground();
+    if (!storedSettings || !storedSettings.extensionEnabled) {
+      console.log("Extension disabled by user.");
       return;
     }
 
-    const { visibleQuality = "Auto", hiddenQuality = "144" } = settings;
-    const targetQuality = document.hidden ? hiddenQuality : visibleQuality;
+    const { storedVisibleQuality, storedHiddenQuality } = storedSettings;
+    const targetQuality = document.hidden
+      ? storedHiddenQuality
+      : storedVisibleQuality;
 
-    console.log(`Demande de qualité : ${targetQuality}`);
+    console.log(`Quality applied : ${targetQuality}`);
     await this.setPlayerQuality(targetQuality);
   }
 
@@ -43,7 +45,7 @@ export class QualitySwitcher {
           this.notifyQualityChange(finalQuality);
         });
       } catch (err) {
-        console.warn("⏱️ Quality menu did not appeared :", err);
+        console.warn("⏱Quality menu did not appeared :", err);
       }
     });
   }
@@ -58,12 +60,50 @@ export class QualitySwitcher {
 
       if (qualityItem) {
         qualityItem.click();
-        setTimeout(callback, 400); // petit délai pour laisser apparaître le menu qualité
+        setTimeout(callback, 1000); // petit délai pour laisser apparaître le menu qualité
       } else {
         console.log("Quality menu item not found.");
       }
     }, 300); // délai pour que le premier menu s'affiche
   }
+
+  // openSettingsMenu(button, callback) {
+  //   button.click();
+
+  //   setTimeout(() => {
+  //     const menuItems = document.querySelectorAll(".ytp-menuitem-label");
+  //     const qualityItem = Array.from(menuItems).find((el) =>
+  //       el.textContent.toLowerCase().includes("qualit")
+  //     );
+
+  //     if (!qualityItem) {
+  //       console.warn("⚠️ Élément 'Qualité' non trouvé.");
+  //       return;
+  //     }
+
+  //     // On prépare un observer AVANT de cliquer pour ne rien rater
+  //     const observer = new MutationObserver((mutations, obs) => {
+  //       const qualityMenu = document.querySelector(".ytp-quality-menu");
+  //       if (qualityMenu) {
+  //         console.log("✅ Menu qualité détecté.");
+  //         obs.disconnect(); // Stopper l'observation
+  //         callback(); // Continuer le processus
+  //       }
+  //     });
+
+  //     // Observer l’élément racine où apparaissent les menus
+  //     const menuContainer = document.querySelector(
+  //       ".ytp-popup.ytp-settings-menu"
+  //     );
+  //     if (menuContainer) {
+  //       observer.observe(menuContainer, { childList: true, subtree: true });
+  //     } else {
+  //       console.warn("⚠️ Menu container introuvable pour observer.");
+  //     }
+
+  //     qualityItem.click(); // Clique sur l'entrée "Qualité"
+  //   }, 300); // petit délai pour que le premier menu soit visible
+  // }
 
   async waitForElement(selector, timeout = 2000) {
     return new Promise((resolve, reject) => {
@@ -95,12 +135,15 @@ export class QualitySwitcher {
     const qualities = document.querySelectorAll(
       ".ytp-quality-menu .ytp-menuitem-label"
     );
+    if (qualities.length === 0) {
+      console.warn("⚠️ Aucune option de qualité trouvée.");
+      return;
+    }
 
     const qualityList = Array.from(qualities).map((q) => ({
       element: q,
       label: q.textContent.trim(),
       resolution: this.extractResolution(q.textContent.trim()),
-      isPremium: q.textContent.toLowerCase().includes("premium"),
     }));
 
     let finalQuality = targetQuality;

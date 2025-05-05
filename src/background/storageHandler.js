@@ -14,18 +14,21 @@ export class StorageHandler {
     return result[setting];
   }
 
-  async readMultipleSettings(defaults = {}) {
-    const result = await chrome.storage.sync.get(defaults);
+  async readMultipleSettings(defaultSettings) {
+    const result = await chrome.storage.sync.get(defaultSettings);
     return result;
   }
 
-  async initializeDefaultsIfMissing(defaults = {}) {
-    const current = await this.readMultipleSettings(defaults);
+  async initializeDefaultsIfMissing(defaultSettings) {
+    const storedSettings = await chrome.storage.sync.get(
+      Object.keys(defaultSettings)
+    );
 
     const toInitialize = {};
-    for (const key in defaults) {
-      if (current[key] === undefined) {
-        toInitialize[key] = defaults[key];
+
+    for (const key in defaultSettings) {
+      if (storedSettings[key] === undefined) {
+        toInitialize[key] = defaultSettings[key];
       }
     }
 
@@ -33,7 +36,7 @@ export class StorageHandler {
       await this.writeMultipleSettings(toInitialize);
       console.log("Default settings added :", toInitialize);
     } else {
-      console.log("Settings already exists :", current);
+      console.log("Settings already exist:", storedSettings);
     }
   }
 }
