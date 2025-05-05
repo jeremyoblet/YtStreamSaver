@@ -66,44 +66,6 @@ export class QualitySwitcher {
     }, 300); // délai pour que le premier menu s'affiche
   }
 
-  // openSettingsMenu(button, callback) {
-  //   button.click();
-
-  //   setTimeout(() => {
-  //     const menuItems = document.querySelectorAll(".ytp-menuitem-label");
-  //     const qualityItem = Array.from(menuItems).find((el) =>
-  //       el.textContent.toLowerCase().includes("qualit")
-  //     );
-
-  //     if (!qualityItem) {
-  //       console.warn("⚠️ Élément 'Qualité' non trouvé.");
-  //       return;
-  //     }
-
-  //     // On prépare un observer AVANT de cliquer pour ne rien rater
-  //     const observer = new MutationObserver((mutations, obs) => {
-  //       const qualityMenu = document.querySelector(".ytp-quality-menu");
-  //       if (qualityMenu) {
-  //         console.log("✅ Menu qualité détecté.");
-  //         obs.disconnect(); // Stopper l'observation
-  //         callback(); // Continuer le processus
-  //       }
-  //     });
-
-  //     // Observer l’élément racine où apparaissent les menus
-  //     const menuContainer = document.querySelector(
-  //       ".ytp-popup.ytp-settings-menu"
-  //     );
-  //     if (menuContainer) {
-  //       observer.observe(menuContainer, { childList: true, subtree: true });
-  //     } else {
-  //       console.warn("⚠️ Menu container introuvable pour observer.");
-  //     }
-
-  //     qualityItem.click(); // Clique sur l'entrée "Qualité"
-  //   }, 300); // petit délai pour que le premier menu soit visible
-  // }
-
   async waitForElement(selector, timeout = 2000) {
     return new Promise((resolve, reject) => {
       const interval = 100;
@@ -120,7 +82,6 @@ export class QualitySwitcher {
 
         setTimeout(check, interval);
       };
-
       check();
     });
   }
@@ -130,20 +91,36 @@ export class QualitySwitcher {
     return match ? parseInt(match[1], 10) : null;
   }
 
+  isPlainResolution(label) {
+    return /^[0-9]+p$/i.test(label.trim()); // ex : "1080p"
+  }
+
+  isPremium(label) {
+    return /premium/i.test(label);
+  }
+
   async selectQuality(targetQuality, callback) {
     const qualities = document.querySelectorAll(
       ".ytp-quality-menu .ytp-menuitem-label"
     );
+
     if (qualities.length === 0) {
       console.warn("⚠️ Aucune option de qualité trouvée.");
       return;
     }
 
-    const qualityList = Array.from(qualities).map((q) => ({
-      element: q,
-      label: q.textContent.trim(),
-      resolution: this.extractResolution(q.textContent.trim()),
-    }));
+    const qualityList = Array.from(qualities)
+      .map((q) => {
+        const label = q.textContent.trim();
+        return {
+          element: q,
+          label,
+          resolution: this.extractResolution(label),
+          isPlain: this.isPlainResolution(label),
+          isPremium: this.isPremium(label),
+        };
+      })
+      .filter((q) => !q.isPremium); // ⚠️ On exclut TOUT de type Premium
 
     let finalQuality = targetQuality;
 
@@ -158,24 +135,25 @@ export class QualitySwitcher {
     } else {
       const targetResolution = parseInt(targetQuality, 10);
 
+      // 1. Privilégier la version propre (ex: "1080p")
       let exactMatch = qualityList.find(
-        (q) => q.resolution === targetResolution && !q.isPremium
+        (q) => q.resolution === targetResolution && q.isPlain
       );
 
+      // 2. Sinon, chercher n'importe quelle version non premium
       if (!exactMatch) {
         exactMatch = qualityList.find((q) => q.resolution === targetResolution);
       }
 
-      if (exactMatch && !exactMatch.isPremium) {
+      // 3. Clic si trouvé
+      if (exactMatch && exactMatch.element) {
         exactMatch.element.click();
         finalQuality = exactMatch.label;
       } else {
+        // 4. Fallback vers la résolution inférieure la plus élevée non premium
         const lowerQualities = qualityList
           .filter(
-            (q) =>
-              q.resolution !== null &&
-              q.resolution <= targetResolution &&
-              !q.isPremium
+            (q) => q.resolution !== null && q.resolution < targetResolution
           )
           .sort((a, b) => b.resolution - a.resolution);
 
@@ -183,6 +161,7 @@ export class QualitySwitcher {
           lowerQualities[0].element.click();
           finalQuality = lowerQualities[0].label;
         } else {
+          // Dernier recours : la plus basse non premium
           const lowest = qualityList[qualityList.length - 1];
           if (lowest) {
             lowest.element.click();
