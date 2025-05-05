@@ -63,7 +63,7 @@ export class QualitySwitcher {
       } else {
         console.log("Quality menu item not found.");
       }
-    }, 300); // délai pour que le premier menu s'affiche
+    }, 1000); // délai pour que le premier menu s'affiche
   }
 
   async waitForElement(selector, timeout = 2000) {
