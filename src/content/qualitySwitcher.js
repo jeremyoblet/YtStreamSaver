@@ -50,38 +50,98 @@ export class QualitySwitcher {
     });
   }
 
+  // async openSettingsMenu(button, callback) {
+  //   button.click();
+
+  //   try {
+  //     const qualityItem = await this.waitForElement(
+  //       ".ytp-menuitem-label", // on attend l’arrivée de n’importe quel item
+  //       2000
+  //     );
+
+  //     // Une fois que les items sont là, on cherche "Qualité"
+  //     const menuItems = document.querySelectorAll(".ytp-menuitem-label");
+  //     const found = Array.from(menuItems).find((el) =>
+  //       el.textContent.toLowerCase().includes("qualit")
+  //     );
+
+  //     if (found) {
+  //       found.click();
+  //       setTimeout(callback, 1000); // petit délai pour que le sous-menu qualité se charge
+  //     } else {
+  //       console.warn("⚠️ Quality menu item not found.");
+  //       this.forceCloseSettingsMenu();
+  //     }
+  //   } catch (err) {
+  //     console.warn("⏱ Timeout while waiting for menu items:", err);
+  //     this.forceCloseSettingsMenu();
+  //   }
+  // }
+
   async openSettingsMenu(button, callback) {
     button.click();
 
     try {
       const qualityItem = await this.waitForElement(
-        ".ytp-menuitem-label", // on attend l’arrivée de n’importe quel item
-        2000
+        ".ytp-menuitem-label", // on observe tous les labels
+        2000,
+        (el) => el.textContent.toLowerCase().includes("qualit") // on attend spécifiquement "qualité"
       );
 
-      // Une fois que les items sont là, on cherche "Qualité"
-      const menuItems = document.querySelectorAll(".ytp-menuitem-label");
-      const found = Array.from(menuItems).find((el) =>
-        el.textContent.toLowerCase().includes("qualit")
-      );
-
-      if (found) {
-        found.click();
-        setTimeout(callback, 500); // petit délai pour que le sous-menu qualité se charge
+      if (qualityItem) {
+        qualityItem.click();
+        setTimeout(callback, 500); // délai pour affichage du sous-menu
       } else {
-        console.warn("⚠️ Quality menu item not found.");
+        console.warn("⚠️ Quality menu item not found (even after wait).");
         this.forceCloseSettingsMenu();
       }
     } catch (err) {
-      console.warn("⏱ Timeout while waiting for menu items:", err);
+      console.warn("⏱ Timeout while waiting for quality menu item:", err);
       this.forceCloseSettingsMenu();
     }
   }
 
-  async waitForElement(selector, timeout = 2000) {
+  // async waitForElement(selector, timeout = 2000) {
+  //   return new Promise((resolve, reject) => {
+  //     const element = document.querySelector(selector);
+  //     if (element) return resolve(element);
+
+  //     const timeoutId = setTimeout(() => {
+  //       observer.disconnect();
+  //       console.warn(
+  //         `⏱ Timeout : Element "${selector}" not found after ${timeout}ms`
+  //       );
+  //       reject(`Element "${selector}" not found after ${timeout}ms`);
+  //     }, timeout);
+
+  //     const observer = new MutationObserver(() => {
+  //       const el = document.querySelector(selector);
+  //       if (el) {
+  //         clearTimeout(timeoutId);
+  //         observer.disconnect();
+  //         resolve(el);
+  //       }
+  //     });
+
+  //     observer.observe(document.body, {
+  //       childList: true,
+  //       subtree: true,
+  //     });
+  //   });
+  // }
+
+  async waitForElement(selector, timeout = 2000, validateFn = null) {
     return new Promise((resolve, reject) => {
-      const element = document.querySelector(selector);
-      if (element) return resolve(element);
+      const tryMatch = () => {
+        const candidates = document.querySelectorAll(selector);
+        for (const el of candidates) {
+          if (!validateFn || validateFn(el)) return el;
+        }
+        return null;
+      };
+
+      const existing = tryMatch();
+      if (existing) return resolve(existing);
 
       const timeoutId = setTimeout(() => {
         observer.disconnect();
@@ -92,11 +152,11 @@ export class QualitySwitcher {
       }, timeout);
 
       const observer = new MutationObserver(() => {
-        const el = document.querySelector(selector);
-        if (el) {
+        const match = tryMatch();
+        if (match) {
           clearTimeout(timeoutId);
           observer.disconnect();
-          resolve(el);
+          resolve(match);
         }
       });
 
