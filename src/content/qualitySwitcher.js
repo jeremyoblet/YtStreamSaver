@@ -1,15 +1,14 @@
 export class QualitySwitcher {
   async handleVisibilityChange() {
     const storedSettings = await this.getQualitiesFromBackground();
+    console.log(storedSettings);
     if (!storedSettings || !storedSettings.extensionEnabled) {
       console.log("Extension disabled by user.");
       return;
     }
 
-    const { storedVisibleQuality, storedHiddenQuality } = storedSettings;
-    const targetQuality = document.hidden
-      ? storedHiddenQuality
-      : storedVisibleQuality;
+    const { visibleQuality, hiddenQuality } = storedSettings;
+    const targetQuality = document.hidden ? hiddenQuality : visibleQuality;
 
     console.log(`Quality applied : ${targetQuality}`);
     await this.setPlayerQuality(targetQuality);

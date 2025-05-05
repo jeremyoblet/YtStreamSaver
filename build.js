@@ -10,8 +10,8 @@ await build({
   outfile: "dist/content.js",
   format: "iife",
   platform: "browser",
-  sourcemap: true,
-  minify: true,
+  sourcemap: false,
+  minify: false,
 });
 
 // 2. Build le background en tant que module
@@ -21,8 +21,8 @@ await build({
   outfile: "dist/background.js",
   format: "esm",
   platform: "browser",
-  sourcemap: true,
-  minify: true,
+  sourcemap: false,
+  minify: false,
 });
 
 // 2. Copier les fichiers nécessaires
