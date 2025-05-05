@@ -50,40 +50,77 @@ export class QualitySwitcher {
     });
   }
 
-  openSettingsMenu(button, callback) {
+  // openSettingsMenu(button, callback) {
+  //   button.click();
+  //   setTimeout(() => {
+  //     const menuItems = document.querySelectorAll(".ytp-menuitem-label");
+  //     const qualityItem = Array.from(menuItems).find((el) =>
+  //       el.textContent.toLowerCase().includes("qualit")
+  //     );
+
+  //     if (qualityItem) {
+  //       qualityItem.click();
+  //       setTimeout(callback, 1000); // petit délai pour laisser apparaître le menu qualité
+  //     } else {
+  //       console.log("Quality menu item not found.");
+  //     }
+  //   }, 1000); // délai pour que le premier menu s'affiche
+  // }
+
+  async openSettingsMenu(button, callback) {
     button.click();
-    setTimeout(() => {
+
+    try {
+      const qualityItem = await this.waitForElement(
+        ".ytp-menuitem-label", // on attend l’arrivée de n’importe quel item
+        2000
+      );
+
+      // Une fois que les items sont là, on cherche "Qualité"
       const menuItems = document.querySelectorAll(".ytp-menuitem-label");
-      const qualityItem = Array.from(menuItems).find((el) =>
+      const found = Array.from(menuItems).find((el) =>
         el.textContent.toLowerCase().includes("qualit")
       );
 
-      if (qualityItem) {
-        qualityItem.click();
-        setTimeout(callback, 1000); // petit délai pour laisser apparaître le menu qualité
+      if (found) {
+        found.click();
+        setTimeout(callback, 500); // petit délai pour que le sous-menu qualité se charge
       } else {
-        console.log("Quality menu item not found.");
+        console.warn("⚠️ Quality menu item not found.");
+        this.forceCloseSettingsMenu();
       }
-    }, 1000); // délai pour que le premier menu s'affiche
+    } catch (err) {
+      console.warn("⏱ Timeout while waiting for menu items:", err);
+      this.forceCloseSettingsMenu();
+    }
   }
 
   async waitForElement(selector, timeout = 2000) {
     return new Promise((resolve, reject) => {
-      const interval = 100;
-      let elapsed = 0;
+      const element = document.querySelector(selector);
+      if (element) return resolve(element);
 
-      const check = () => {
-        const element = document.querySelector(selector);
-        if (element) return resolve(element);
+      const timeoutId = setTimeout(() => {
+        observer.disconnect();
+        console.warn(
+          `⏱ Timeout : Element "${selector}" not found after ${timeout}ms`
+        );
+        reject(`Element "${selector}" not found after ${timeout}ms`);
+      }, timeout);
 
-        elapsed += interval;
-        if (elapsed >= timeout) {
-          return reject(`Element "${selector}" not found after ${timeout}ms`);
+      const observer = new MutationObserver(() => {
+        const el = document.querySelector(selector);
+        if (el) {
+          clearTimeout(timeoutId);
+          observer.disconnect();
+          resolve(el);
         }
+      });
 
-        setTimeout(check, interval);
-      };
-      check();
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+      });
     });
   }
 
