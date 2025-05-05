@@ -50,23 +50,6 @@ export class QualitySwitcher {
     });
   }
 
-  // openSettingsMenu(button, callback) {
-  //   button.click();
-  //   setTimeout(() => {
-  //     const menuItems = document.querySelectorAll(".ytp-menuitem-label");
-  //     const qualityItem = Array.from(menuItems).find((el) =>
-  //       el.textContent.toLowerCase().includes("qualit")
-  //     );
-
-  //     if (qualityItem) {
-  //       qualityItem.click();
-  //       setTimeout(callback, 1000); // petit délai pour laisser apparaître le menu qualité
-  //     } else {
-  //       console.log("Quality menu item not found.");
-  //     }
-  //   }, 1000); // délai pour que le premier menu s'affiche
-  // }
-
   async openSettingsMenu(button, callback) {
     button.click();
 
