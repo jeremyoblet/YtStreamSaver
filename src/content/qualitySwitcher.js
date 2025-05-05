@@ -11,6 +11,7 @@ export class QualitySwitcher {
     const targetQuality = document.hidden ? hiddenQuality : visibleQuality;
 
     console.log(`Quality applied : ${targetQuality}`);
+    this.forceCloseSettingsMenu();
     await this.setPlayerQuality(targetQuality);
   }
 
@@ -173,6 +174,17 @@ export class QualitySwitcher {
 
     console.log(`✅ Selected quality : ${finalQuality}`);
     callback(finalQuality);
+  }
+
+  forceCloseSettingsMenu() {
+    const settingsMenu = document.querySelector(".ytp-settings-menu");
+    const settingsButton = document.querySelector(".ytp-settings-button");
+
+    if (settingsMenu && settingsMenu.offsetParent !== null && settingsButton) {
+      // Le menu est visible → on clique à nouveau pour le fermer
+      settingsButton.click();
+      console.log("⚙️ Menu settings fermé de force.");
+    }
   }
 
   notifyQualityChange(finalQuality) {
