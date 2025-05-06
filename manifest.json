@@ -1,8 +1,8 @@
 {
-  "name": "Yt Stream Saver",
-  "version": "1.0",
+  "name": "Stream Saver extension",
+  "version": "0.1.0",
   "manifest_version": 3,
-  "description": "Notify Youtube videos qualities when the tab or Chrome are hidden",
+  "description": "Automatically adjusts YouTube video quality based on tab or window visibility.",
   "permissions": ["notifications", "storage", "tabs", "scripting"],
   "background": {
     "service_worker": "background.js",
@@ -10,7 +10,12 @@
   },
   "action": {
     "default_popup": "popup.html",
-    "default_icon": "icons/icon.png"
+    "default_icon": "icons/icon_48.png"
   },
-  "host_permissions": ["*://www.youtube.com/*"]
+  "host_permissions": ["*://www.youtube.com/*"],
+  "icons": {
+    "16": "icons/icon_16.png",
+    "48": "icons/icon_48.png",
+    "128": "icons/icon_128.png"
+  }
 }

@@ -11,7 +11,7 @@ await build({
   format: "iife",
   platform: "browser",
   sourcemap: false,
-  minify: false,
+  minify: true,
 });
 
 // 2. Build le background en tant que module
@@ -22,7 +22,7 @@ await build({
   format: "esm",
   platform: "browser",
   sourcemap: false,
-  minify: false,
+  minify: true,
 });
 
 // 2. Copier les fichiers nécessaires
