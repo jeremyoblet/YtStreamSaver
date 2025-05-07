@@ -1,76 +1,56 @@
-/* 🌿 Global */
 body {
-    font-family: "Poppins", sans-serif;
-    background: linear-gradient(135deg, #1e3a34, #2c5b48);
-    color: #f5f5f5;
+    font-family: "Founders Grotesk", "Roboto", sans-serif;
+    background: #1B1B1B;
+    color: #FFFFFF;
     text-align: center;
-    padding: 15px;
-    max-width: 280px; /* ✅ Fenêtre plus compacte */
     margin: auto;
+    min-width: 250px;
 }
 
-/* 🌍 Container */
 .container {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    padding: 15px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(10px);
+    background: #1B1B1B;
+    margin: 5px;
 }
 
-/* 🏷️ Titres */
 h1 {
-    font-size: 22px;
-    margin-bottom: 10px;
-    color: #c8f7c5;
+    font-size: 24px;
+    margin-bottom: 15px;
+    color: #FFFFFF;
+    font-weight: bold;
 }
 
 h2 {
-    font-size: 16px;
-    color: #a0e7a0;
-    margin-bottom: 8px;
-}
-
-/* 📦 Cartes */
-.option-card {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    padding: 12px;
+    font-size: 18px;
+    color: #FFFFFF;
     margin-bottom: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* 📌 Sélecteurs */
-label {
-    font-size: 13px;
-    display: block;
-    margin-top: 8px;
-    font-weight: bold;
-    text-align: left;
+.option-card {
+    background: #2B2B2B;
+    border-radius: 8px;
+    padding: 15px;
     margin-bottom: 5px;
 }
 
+label {
+    font-size: 14px;
+    color: #FFFFFF;
+    display: block;
+    text-align: left;
+}
+
 select {
-    width: 100%;
-    padding: 8px;
+    padding: 5px;
     border-radius: 6px;
-    border: none;
-    background: #2c5b48;
-    color: #fff;
-    font-size: 13px;
+    border: 1px solid #4CAF50;
+    background: #1B1B1B;
+    color: #FFFFFF;
+    font-size: 14px;
     cursor: pointer;
-    transition: 0.3s;
 }
 
 select:hover {
-    background: #3b7a64;
-}
-
-/* 🎚️ Switch */
-.toggle-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    background: #2B2B2B;
 }
 
 .switch {
@@ -93,9 +73,9 @@ select:hover {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
+    background-color: #555;
     transition: 0.4s;
-    border-radius: 20px;
+    border-radius: 34px;
 }
 
 .slider:before {
@@ -119,20 +99,46 @@ input:checked + .slider:before {
 }
 
 .toggle-label {
-    font-size: 13px;
-    color: #d3f7d3;
+    font-size: 14px;
+    color: #FFFFFF;
     margin-left: 10px;
 }
 
-/* 🌍 Stats */
 .stats {
     font-size: 13px;
+    color: #FFFFFF;
     font-weight: bold;
     margin: 12px 0;
-    background: rgba(255, 255, 255, 0.15);
+    background: #2B2B2B;
     padding: 8px;
     border-radius: 6px;
 }
 
-/* 🟢 Bouton */
-.b
+button {
+    background: #4CAF50;
+    color: #1B1B1B;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+}
+
+button:hover {
+    background: #45A049;
+}
+
+.option-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .option-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #FFFFFF;
+  }

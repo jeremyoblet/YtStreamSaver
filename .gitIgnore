@@ -1,0 +1,16 @@
+# Ignorer les dépendances
+node_modules/
+
+# Ignorer les fichiers de build
+dist/
+
+# Ignorer les fichiers de logs
+*.log
+
+# Ignorer les fichiers de l'éditeur
+.vscode/
+*.code-workspace
+
+# Ignorer le système de l'OS
+.DS_Store
+Thumbs.db
