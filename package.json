@@ -20,6 +20,7 @@
   "homepage": "https://github.com/jeremyoblet/YtStreamSaver#readme",
   "devDependencies": {
     "@eslint/js": "^9.25.1",
+    "@types/chrome": "^0.0.320",
     "esbuild": "^0.25.4",
     "eslint": "^9.25.1",
     "globals": "^16.0.0",
