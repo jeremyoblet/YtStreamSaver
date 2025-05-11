@@ -1,81 +1,57 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const extensionCheckbox = document.getElementById("extensionEnabled");
-  const visibleSelect = document.getElementById("visibleQuality");
-  const hiddenSelect = document.getElementById("hiddenQuality");
-  const notificationsCheckbox = document.getElementById("notificationsEnabled");
+import { getUIElements } from "./ui";
+import {
+  getSettingsFromBackground,
+  updateSettings,
+  notifyTabsQualityChanged,
+} from "./messaging";
+import { VideoQuality } from "../types";
 
-  async function getSettingsFromBackground() {
-    return new Promise((resolve) => {
-      chrome.runtime.sendMessage({ type: "getSettings" }, (response) => {
-        resolve(response.settings);
-      });
-    });
-  }
+document.addEventListener("DOMContentLoaded", async () => {
+  const ui = getUIElements();
 
   async function applySettingsToUI() {
     const settings = await getSettingsFromBackground();
-    extensionCheckbox.checked = settings.extensionEnabled;
-    visibleSelect.value = settings.visibleQuality;
-    hiddenSelect.value = settings.hiddenQuality;
-    notificationsCheckbox.checked = settings.notificationsEnabled;
+    ui.extensionCheckbox.checked = settings.extensionEnabled;
+    ui.visibleSelect.value = settings.visibleQuality;
+    ui.hiddenSelect.value = settings.hiddenQuality;
+    ui.notificationsCheckbox.checked = settings.notificationsEnabled;
   }
 
-  function addListenersToSettings() {
-    extensionCheckbox.addEventListener("change", () => {
-      chrome.runtime.sendMessage(
-        {
-          type: "updateSetting",
-          key: "extensionEnabled",
-          value: extensionCheckbox.checked,
-        },
-        (response) => {
-          console.log("Réglage enregistré ?", response.success);
-        }
-      );
+  function getAllSettingsFromUI() {
+    return {
+      extensionEnabled: ui.extensionCheckbox.checked,
+      visibleQuality: ui.visibleSelect.value as VideoQuality,
+      hiddenQuality: ui.hiddenSelect.value as VideoQuality,
+      notificationsEnabled: ui.notificationsCheckbox.checked,
+    };
+  }
+
+  async function updateAllSettingsFromUI() {
+    const newSettings = getAllSettingsFromUI();
+    const response = await updateSettings(newSettings);
+    console.log("Tous les réglages mis à jour ?", response.success);
+  }
+
+  function addListeners() {
+    ui.extensionCheckbox.addEventListener("change", async () => {
+      await updateAllSettingsFromUI();
     });
 
-    visibleSelect.addEventListener("change", () => {
-      chrome.runtime.sendMessage(
-        {
-          type: "updateSetting",
-          key: "visibleQuality",
-          value: visibleSelect.value,
-        },
-        (response) => {
-          console.log("Réglage enregistré ?", response.success);
-        }
-      );
-      chrome.runtime.sendMessage({ type: "notifyTabsQualityChanged" });
+    ui.visibleSelect.addEventListener("change", async () => {
+      await updateAllSettingsFromUI();
+      notifyTabsQualityChanged();
     });
 
-    hiddenSelect.addEventListener("change", () => {
-      chrome.runtime.sendMessage(
-        {
-          type: "updateSetting",
-          key: "hiddenQuality",
-          value: hiddenSelect.value,
-        },
-        (response) => {
-          console.log("Réglage enregistré ?", response.success);
-        }
-      );
-      // chrome.runtime.sendMessage({ type: "notifyTabsQualityChanged" });
+    ui.hiddenSelect.addEventListener("change", async () => {
+      await updateAllSettingsFromUI();
+      // notifyTabsQualityChanged();
     });
 
-    notificationsCheckbox.addEventListener("change", () => {
-      chrome.runtime.sendMessage(
-        {
-          type: "updateSetting",
-          key: "notificationsEnabled",
-          value: notificationsCheckbox.checked,
-        },
-        (response) => {
-          console.log("Réglage enregistré ?", response.success);
-        }
-      );
+    ui.notificationsCheckbox.addEventListener("change", async () => {
+      await updateAllSettingsFromUI();
     });
   }
 
-  applySettingsToUI();
-  addListenersToSettings();
+  await applySettingsToUI();
+  addListeners();
 });

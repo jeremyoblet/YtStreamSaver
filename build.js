@@ -18,7 +18,7 @@ await build({
 
 await build({
   ...sharedConfig,
-  entryPoints: ["src/background/background.js"],
+  entryPoints: ["src/background/background.ts"],
   outfile: "dist/background.js",
   format: "esm",
 });

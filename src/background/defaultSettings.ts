@@ -1,4 +1,6 @@
-export const defaultSettings = {
+import { Settings } from "../types";
+
+export const defaultSettings: Settings = {
   extensionEnabled: true,
   visibleQuality: "Auto",
   hiddenQuality: "144",
