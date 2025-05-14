@@ -1,0 +1,25 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---  
+description: >
+  Architecture modulaire et scalable pour l'extension Chrome GreenStreamON.
+  Séparation claire des responsabilités entre les couches Infrastructure, Domaine, UI et Configuration.
+globs:
+  - "src/**/*.ts"
+  - "src/**/*.tsx"
+alwaysApply: true
+---
+
+## ✅ Bonnes pratiques
+
+- Utiliser TypeScript avec l'option `strict` activée.
+- Préférer `async/await` pour la gestion des promesses.
+- Utiliser `const` par défaut, et `let` uniquement si nécessaire.
+- Nommer les fonctions et classes en anglais, avec des noms explicites.
+- Ne pas modifier directement le DOM de YouTube sans vérification préalable (`await waitForElement()` recommandé).
+- Centraliser la gestion des réglages utilisateur via `StorageHandler`.
+- Éviter la duplication de logique entre le content script et le background script.
+
