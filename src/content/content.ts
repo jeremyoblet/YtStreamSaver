@@ -1,4 +1,6 @@
-import { QualitySwitcher } from "./qualitySwitcher.js";
+import { QualitySwitcher } from "./qualitySwitcher";
+
+declare const window: Window & { hasRunContentScript?: boolean };
 
 if (!window.hasRunContentScript) {
   window.hasRunContentScript = true;
@@ -7,7 +9,7 @@ if (!window.hasRunContentScript) {
 
   const qualitySwitcher = new QualitySwitcher();
 
-  // 1. Appliquer la qualité au démarrage (après que le player est prêt)
+  // 1. Appliquer la qualité au démarrage
   waitForElement(".ytp-settings-button", 10000)
     .then(() => {
       qualitySwitcher.handleVisibilityChange();
@@ -16,20 +18,20 @@ if (!window.hasRunContentScript) {
       console.warn("Player not detected at start :", err);
     });
 
-  // 2. Re-appliquer la qualité lors des changements d’onglet
+  // 2. Appliquer la qualité lors des changements d’onglet
   document.addEventListener("visibilitychange", async () => {
     await qualitySwitcher.handleVisibilityChange();
   });
 
   // 3. Permettre au background de forcer une mise à jour
-  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  chrome.runtime.onMessage.addListener((message: any) => {
     if (message.type === "refreshQuality") {
-      console.log("🔁 Message recieved : refreshQuality");
+      console.log("🔁 Message received : refreshQuality");
       qualitySwitcher.handleVisibilityChange();
     }
   });
 
-  // 4. Observer les changements d’URL (SPA YouTube)
+  // 4. Détecter les changements d’URL (SPA YouTube)
   let lastUrl = location.href;
   new MutationObserver(() => {
     const currentUrl = location.href;
@@ -51,7 +53,10 @@ if (!window.hasRunContentScript) {
   }).observe(document, { subtree: true, childList: true });
 }
 
-function waitForElement(selector, timeout = 10000) {
+function waitForElement(
+  selector: string,
+  timeout: number = 10000
+): Promise<Element> {
   return new Promise((resolve, reject) => {
     const interval = 100;
     let elapsed = 0;
