@@ -1,0 +1,31 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---
+description: >
+  Règles spécifiques pour interagir avec le DOM de YouTube sans compromettre la stabilité ou la compatibilité de l’extension.
+globs:
+  - "src/content/**/*.ts"
+alwaysApply: true
+---
+
+## 🎬 Manipulation du DOM YouTube
+
+- Ne jamais supposer que le DOM est chargé : toujours utiliser un `waitForElement(selector)` ou un `MutationObserver`.
+- Les `querySelector` doivent être robustes : éviter les sélecteurs trop spécifiques ou instables.
+- Éviter les `setTimeout` pour attendre le DOM ; préférer des observers réactifs.
+- Ne jamais injecter de HTML : uniquement manipuler les éléments existants.
+
+## 📹 Qualité vidéo
+
+- Utiliser les API internes YouTube (comme `player.getAvailableQualityLevels()`) si disponibles.
+- Si indisponibles, modifier le menu qualité via des événements DOM simulés uniquement si l’utilisateur n’interagit pas.
+- Ne pas modifier la qualité si la vidéo est en pause ou si l’utilisateur a changé la qualité manuellement récemment (dans les 60 dernières secondes).
+
+## 🧪 Fallbacks
+
+- Si le DOM ne contient pas les éléments nécessaires après 5 secondes, logger une erreur (`console.warn`) mais ne pas planter.
+- Prévoir un système de retry espacé ou une boucle de vérification limitée dans le temps.
+

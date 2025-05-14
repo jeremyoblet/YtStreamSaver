@@ -1,0 +1,34 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---
+description: >
+  Règles de style TypeScript strictes pour garantir un code maintenable, lisible et cohérent dans toute l’extension Chrome.
+globs:
+  - "src/**/*.ts"
+  - "src/**/*.tsx"
+alwaysApply: true
+---
+
+## ✍️ Convention de code TypeScript
+
+- Le projet doit utiliser `strict: true` dans `tsconfig.json`.
+- Toujours typer explicitement les retours de fonctions publiques.
+- Ne jamais utiliser `any` sauf cas extrême (justifié par un commentaire).
+- Utiliser `const` par défaut, `let` uniquement si nécessaire.
+- Utiliser `readonly` pour les objets immuables.
+- Utiliser des `enum` ou `literal types` pour les valeurs fixes comme les niveaux de qualité.
+
+## 🧠 Promesses et async
+
+- Toujours utiliser `async/await` pour la gestion des promesses.
+- Éviter `.then().catch()` imbriqués : cela nuit à la lisibilité.
+- Regrouper les appels asynchrones récurrents dans des services dédiés.
+
+## 📦 Organisation
+
+- Chaque fichier ne doit contenir qu’une seule classe principale ou un seul composant logique.
+- Préférer l’export `default` pour les services et les entités métiers clés.
+
