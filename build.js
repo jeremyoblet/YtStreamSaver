@@ -11,7 +11,7 @@ const sharedConfig = {
 
 await build({
   ...sharedConfig,
-  entryPoints: ["src/content/content.js"],
+  entryPoints: ["src/content/content.ts"],
   outfile: "dist/content.js",
   format: "iife",
 });

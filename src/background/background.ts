@@ -4,6 +4,11 @@ import { Message, Settings } from "../types";
 
 const storage = new StorageHandler();
 
+async function initialize(): Promise<void> {
+  await storage.initializeDefaultsIfMissing(defaultSettings);
+  console.log("Default settings checked.");
+}
+
 chrome.runtime.onInstalled.addListener(async () => {
   await initialize();
   console.log("Extension installée et paramètres initialisés");
@@ -13,11 +18,6 @@ chrome.runtime.onStartup.addListener(async () => {
   await initialize();
   console.log("Extension démarrée et paramètres vérifiés");
 });
-
-async function initialize(): Promise<void> {
-  await storage.initializeDefaultsIfMissing(defaultSettings);
-  console.log("Default settings checked.");
-}
 
 chrome.runtime.onMessage.addListener(
   (message: Message, sender, sendResponse) => {

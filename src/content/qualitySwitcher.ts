@@ -29,17 +29,25 @@ export class QualitySwitcher {
 
   async getQualitiesFromBackground(): Promise<Settings | null> {
     return new Promise((resolve) => {
-      chrome.runtime.sendMessage({ type: "getSettings" }, (response) => {
-        if (chrome.runtime.lastError || !response?.settings) {
-          console.warn(
-            "Impossible de récupérer les réglages :",
-            chrome.runtime.lastError
-          );
-          resolve(null);
-        } else {
-          resolve(response.settings);
-        }
-      });
+      try {
+        chrome.runtime.sendMessage({ type: "getSettings" }, (response) => {
+          if (chrome.runtime.lastError || !response?.settings) {
+            console.warn(
+              "Impossible de récupérer les réglages :",
+              chrome.runtime.lastError
+            );
+            resolve(null);
+          } else {
+            resolve(response.settings);
+          }
+        });
+      } catch (err) {
+        console.error(
+          "Erreur inattendue lors du message vers le background :",
+          err
+        );
+        resolve(null);
+      }
     });
   }
 
