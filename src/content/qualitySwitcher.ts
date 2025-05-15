@@ -2,26 +2,31 @@ import { Settings, VideoQuality } from "../types";
 
 export class QualitySwitcher {
   async handleVisibilityChange(): Promise<void> {
-    const storedSettings = await this.getQualitiesFromBackground();
-    if (!storedSettings || !storedSettings.extensionEnabled) {
-      console.log("Extension disabled by user.");
-      return;
+    try {
+      const storedSettings = await this.getQualitiesFromBackground();
+      if (!storedSettings || !storedSettings.extensionEnabled) {
+        console.log("[qualitySwitcher] Extension disabled by user.");
+        return;
+      }
+  
+      const isPaused = this.isVideoPaused();
+      if (isPaused) {
+        console.log("[qualitySwitcher] Vidéo en pause, aucun changement de qualité.");
+        return;
+      }
+  
+      const { visibleQuality, hiddenQuality } = storedSettings;
+      const targetQuality = document.hidden ? hiddenQuality : visibleQuality;
+  
+      console.log(`[qualitySwitcher] Qualité appliquée : ${targetQuality}`);
+      this.forceCloseSettingsMenu();
+      await this.setPlayerQuality(targetQuality);
+  
+    } catch (error) {
+      console.error("[qualitySwitcher] Erreur lors du changement de qualité :", error);
     }
-
-    const isPaused = this.isVideoPaused();
-    if (isPaused) {
-      console.log("Vidéo en pause, aucun changement de qualité.");
-      return;
-    }
-
-    const { visibleQuality, hiddenQuality } = storedSettings;
-    const targetQuality = document.hidden ? hiddenQuality : visibleQuality;
-
-    console.log(`🎯 Qualité appliquée : ${targetQuality}`);
-    this.forceCloseSettingsMenu();
-    await this.setPlayerQuality(targetQuality);
   }
-
+  
   isVideoPaused(): boolean {
     const video = document.querySelector("video") as HTMLVideoElement | null;
     return video ? video.paused : true;
@@ -33,7 +38,7 @@ export class QualitySwitcher {
         chrome.runtime.sendMessage({ type: "getSettings" }, (response) => {
           if (chrome.runtime.lastError || !response?.settings) {
             console.warn(
-              "Impossible de récupérer les réglages :",
+              "[qualitySwitcher] Impossible de récupérer les réglages :",
               chrome.runtime.lastError
             );
             resolve(null);
@@ -43,7 +48,7 @@ export class QualitySwitcher {
         });
       } catch (err) {
         console.error(
-          "Erreur inattendue lors du message vers le background :",
+          "[qualitySwitcher] Erreur inattendue lors du message vers le background :",
           err
         );
         resolve(null);
@@ -56,18 +61,18 @@ export class QualitySwitcher {
       ".ytp-settings-button"
     ) as HTMLElement | null;
     if (!settingsButton) {
-      console.log("🔘 Bouton des paramètres non trouvé.");
+      console.log("[qualitySwitcher] Bouton des paramètres non trouvé.");
       return;
     }
 
     this.openSettingsMenu(settingsButton, async () => {
       try {
-        await this.waitForElement(".ytp-quality-menu", 2000);
+        await this.waitForElement(".ytp-quality-menu", 5000);
         await this.selectQuality(targetQuality, (finalQuality) => {
           this.notifyQualityChange(finalQuality);
         });
       } catch (err) {
-        console.warn("⏱ Le menu qualité ne s'est pas affiché :", err);
+        console.warn("[qualitySwitcher] Le menu qualité ne s'est pas affiché :", err);
       }
     });
   }
@@ -89,11 +94,11 @@ export class QualitySwitcher {
         qualityItem.click();
         setTimeout(callback, 500);
       } else {
-        console.warn("⚠️ Élément 'qualité' non trouvé.");
+        console.warn("[qualitySwitcher] Élément 'qualité' non trouvé.");
         this.forceCloseSettingsMenu();
       }
     } catch (err) {
-      console.warn("⏱ Timeout sur openSettingsMenu :", err);
+      console.warn("[qualitySwitcher] Timeout sur openSettingsMenu :", err);
       this.forceCloseSettingsMenu();
     }
   }
@@ -148,67 +153,135 @@ export class QualitySwitcher {
     return /premium/i.test(label);
   }
 
+  // async selectQuality(
+  //   targetQuality: VideoQuality,
+  //   callback: (finalQuality: string) => void
+  // ): Promise<void> {
+  //   const qualities = document.querySelectorAll(
+  //     ".ytp-quality-menu .ytp-menuitem-label"
+  //   );
+  //   if (qualities.length === 0) {
+  //     console.warn("[qualitySwitcher] Aucune qualité trouvée.");
+  //     return;
+  //   }
+
+  //   const qualityList = Array.from(qualities)
+  //     .map((q) => {
+  //       const label = q.textContent?.trim() || "";
+  //       return {
+  //         element: q as HTMLElement,
+  //         label,
+  //         resolution: this.extractResolution(label),
+  //         isPlain: this.isPlainResolution(label),
+  //         isPremium: this.isPremium(label),
+  //       };
+  //     })
+  //     .filter((q) => !q.isPremium);
+
+  //   let finalQuality = targetQuality;
+
+  //   if (targetQuality.toLowerCase() === "auto") {
+  //     const auto = qualityList.find((q) =>
+  //       q.label.toLowerCase().includes("auto")
+  //     );
+  //     if (auto) {
+  //       auto.element.click();
+  //       finalQuality = auto.label;
+  //     }
+  //   } else {
+  //     const targetRes = parseInt(targetQuality, 10);
+  //     let match =
+  //       qualityList.find((q) => q.resolution === targetRes && q.isPlain) ||
+  //       qualityList.find((q) => q.resolution === targetRes);
+
+  //     if (match) {
+  //       match.element.click();
+  //       finalQuality = match.label;
+  //     } else {
+  //       const fallback =
+  //         qualityList
+  //           .filter((q) => q.resolution !== null && q.resolution < targetRes)
+  //           .sort((a, b) => b.resolution! - a.resolution!)[0] ||
+  //         qualityList[qualityList.length - 1];
+
+  //       if (fallback) {
+  //         fallback.element.click();
+  //         finalQuality = fallback.label;
+  //       }
+  //     }
+  //   }
+
+  //   console.log(`[qualitySwitcher] Qualité sélectionnée : ${finalQuality}`);
+  //   callback(finalQuality);
+  // }
+
   async selectQuality(
     targetQuality: VideoQuality,
     callback: (finalQuality: string) => void
   ): Promise<void> {
-    const qualities = document.querySelectorAll(
-      ".ytp-quality-menu .ytp-menuitem-label"
-    );
-    if (qualities.length === 0) {
-      console.warn("⚠️ Aucune qualité trouvée.");
-      return;
-    }
-
-    const qualityList = Array.from(qualities)
-      .map((q) => {
-        const label = q.textContent?.trim() || "";
-        return {
-          element: q as HTMLElement,
-          label,
-          resolution: this.extractResolution(label),
-          isPlain: this.isPlainResolution(label),
-          isPremium: this.isPremium(label),
-        };
-      })
-      .filter((q) => !q.isPremium);
-
-    let finalQuality = targetQuality;
-
-    if (targetQuality.toLowerCase() === "auto") {
-      const auto = qualityList.find((q) =>
-        q.label.toLowerCase().includes("auto")
+    try {
+      const qualities = document.querySelectorAll(
+        ".ytp-quality-menu .ytp-menuitem-label"
       );
-      if (auto) {
-        auto.element.click();
-        finalQuality = auto.label;
+  
+      if (qualities.length === 0) {
+        console.warn("[qualitySwitcher] Aucune qualité trouvée.");
+        return;
       }
-    } else {
-      const targetRes = parseInt(targetQuality, 10);
-      let match =
-        qualityList.find((q) => q.resolution === targetRes && q.isPlain) ||
-        qualityList.find((q) => q.resolution === targetRes);
-
-      if (match) {
-        match.element.click();
-        finalQuality = match.label;
+  
+      const qualityList = Array.from(qualities)
+        .map((q) => {
+          const label = q.textContent?.trim() || "";
+          return {
+            element: q as HTMLElement,
+            label,
+            resolution: this.extractResolution(label),
+            isPlain: this.isPlainResolution(label),
+            isPremium: this.isPremium(label),
+          };
+        })
+        .filter((q) => !q.isPremium);
+  
+      let finalQuality = targetQuality;
+  
+      if (targetQuality.toLowerCase() === "auto") {
+        const auto = qualityList.find((q) =>
+          q.label.toLowerCase().includes("auto")
+        );
+        if (auto) {
+          auto.element.click();
+          finalQuality = auto.label;
+        }
       } else {
-        const fallback =
-          qualityList
-            .filter((q) => q.resolution !== null && q.resolution < targetRes)
-            .sort((a, b) => b.resolution! - a.resolution!)[0] ||
-          qualityList[qualityList.length - 1];
-
-        if (fallback) {
-          fallback.element.click();
-          finalQuality = fallback.label;
+        const targetRes = parseInt(targetQuality, 10);
+        let match =
+          qualityList.find((q) => q.resolution === targetRes && q.isPlain) ||
+          qualityList.find((q) => q.resolution === targetRes);
+  
+        if (match) {
+          match.element.click();
+          finalQuality = match.label;
+        } else {
+          const fallback =
+            qualityList
+              .filter((q) => q.resolution !== null && q.resolution! < targetRes)
+              .sort((a, b) => b.resolution! - a.resolution!)[0] ||
+            qualityList[qualityList.length - 1];
+  
+          if (fallback) {
+            fallback.element.click();
+            finalQuality = fallback.label;
+          }
         }
       }
+  
+      console.log(`[qualitySwitcher] Qualité sélectionnée : ${finalQuality}`);
+      callback(finalQuality);
+    } catch (error) {
+      console.error("[qualitySwitcher] Erreur lors de la sélection de qualité :", error);
     }
-
-    console.log(`✅ Qualité sélectionnée : ${finalQuality}`);
-    callback(finalQuality);
   }
+  
 
   forceCloseSettingsMenu(): void {
     const menu = document.querySelector(".ytp-settings-menu");
@@ -223,7 +296,7 @@ export class QualitySwitcher {
       button
     ) {
       button.click();
-      console.log("⚙️ Menu paramètres fermé manuellement.");
+      console.log("[qualitySwitcher] Menu paramètres fermé manuellement.");
     }
   }
 

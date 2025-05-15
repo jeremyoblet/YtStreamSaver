@@ -1,11 +1,16 @@
 import { QualitySwitcher } from "./qualitySwitcher";
+import { fixYoutubeSettingsButtonLabel } from "./fixSettingsButtonLabel";
+
+if (location.hostname.includes("youtube.com")) {
+  fixYoutubeSettingsButtonLabel();
+}
 
 declare const window: Window & { hasRunContentScript?: boolean };
 
 if (!window.hasRunContentScript) {
   window.hasRunContentScript = true;
 
-  console.log("YT Stream Saver - Content script started");
+  console.log("GREEN STREAM ON - Content script started");
 
   const qualitySwitcher = new QualitySwitcher();
 
