@@ -1,6 +1,7 @@
 import { QualitySwitcher } from "./qualitySwitcher";
 import { fixYoutubeSettingsButtonLabel } from "./fixSettingsButtonLabel";
 
+// Exécuter le correctif sur l'UI de YouTube
 if (location.hostname.includes("youtube.com")) {
   fixYoutubeSettingsButtonLabel();
 }
@@ -14,13 +15,13 @@ if (!window.hasRunContentScript) {
 
   const qualitySwitcher = new QualitySwitcher();
 
-  // 1. Appliquer la qualité au démarrage
-  waitForElement(".ytp-settings-button", 10000)
+  // 1. Appliquer la qualité au démarrage lorsque le player est prêt
+  waitForYoutubePlayerReady(10000)
     .then(() => {
       qualitySwitcher.handleVisibilityChange();
     })
     .catch((err) => {
-      console.warn("Player not detected at start :", err);
+      console.warn("Player not ready at start:", err);
     });
 
   // 2. Appliquer la qualité lors des changements d’onglet
@@ -28,7 +29,7 @@ if (!window.hasRunContentScript) {
     await qualitySwitcher.handleVisibilityChange();
   });
 
-  // 3. Permettre au background de forcer une mise à jour
+  // 3. Permettre au background script de forcer une mise à jour
   chrome.runtime.onMessage.addListener((message: any) => {
     if (message.type === "refreshQuality") {
       console.log("🔁 Message received : refreshQuality");
@@ -44,40 +45,46 @@ if (!window.hasRunContentScript) {
       lastUrl = currentUrl;
 
       if (currentUrl.includes("youtube.com/watch")) {
-        console.log("💡 New video detected :", currentUrl);
+        console.log("💡 New video detected:", currentUrl);
 
-        waitForElement(".ytp-settings-button", 10000)
+        waitForYoutubePlayerReady(10000)
           .then(() => {
             qualitySwitcher.handleVisibilityChange();
           })
           .catch((err) => {
-            console.warn("Quality switch is not possible :", err);
+            console.warn("Quality switch is not possible:", err);
           });
       }
     }
   }).observe(document, { subtree: true, childList: true });
 }
 
-function waitForElement(
-  selector: string,
-  timeout: number = 10000
-): Promise<Element> {
+// ✅ Fonction robuste pour détecter que le player est prêt (lecture en cours)
+function waitForYoutubePlayerReady(timeout = 10000): Promise<HTMLVideoElement> {
+  const pollInterval = 100;
+  let elapsed = 0;
+
   return new Promise((resolve, reject) => {
-    const interval = 100;
-    let elapsed = 0;
+    const interval = setInterval(() => {
+      const video = document.querySelector("video") as HTMLVideoElement;
+      const settingsBtn = document.querySelector(".ytp-settings-button");
 
-    const check = () => {
-      const element = document.querySelector(selector);
-      if (element) return resolve(element);
+      const isReady =
+        video &&
+        settingsBtn &&
+        video.readyState >= 3 && // HAVE_FUTURE_DATA (le flux vidéo est prêt à être lu)
+        !video.paused;
 
-      elapsed += interval;
-      if (elapsed >= timeout) {
-        return reject(`Element "${selector}" not found after ${timeout}ms`);
+      if (isReady) {
+        clearInterval(interval);
+        resolve(video);
       }
 
-      setTimeout(check, interval);
-    };
-
-    check();
+      elapsed += pollInterval;
+      if (elapsed >= timeout) {
+        clearInterval(interval);
+        reject("YouTube player not ready after timeout");
+      }
+    }, pollInterval);
   });
 }
