@@ -1,4 +1,4 @@
-import { Settings } from "../types";
+import { Settings } from "../../types";
 
 export class StorageHandler {
   async writeMultipleSettings(settings: Partial<Settings>): Promise<void> {
@@ -49,7 +49,10 @@ export class StorageHandler {
         console.log("[storageHandler] Settings already exist:", storedSettings);
       }
     } catch (error) {
-      console.error("[storageHandler] Error initializing default settings:", error);
+      console.error(
+        "[storageHandler] Error initializing default settings:",
+        error
+      );
     }
   }
 }

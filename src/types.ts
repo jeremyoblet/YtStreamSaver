@@ -1,3 +1,28 @@
+// export type VideoQualityStandard =
+//   | "Auto"
+//   | "144"
+//   | "240"
+//   | "360"
+//   | "480"
+//   | "720"
+//   | "1080";
+
+// export type VideoQualityPremium =
+//   | "Auto"
+//   | "144"
+//   | "240"
+//   | "360"
+//   | "480"
+//   | "720"
+//   | "1080"
+//   | "1080hdPremium"
+//   | "1440"
+//   | "1440hdPremium"
+//   | "2160"
+//   | "2160hdPremium"
+//   | "4320"
+//   | "4320hdPremium";
+
 export type VideoQuality =
   | "Auto"
   | "144"
@@ -12,6 +37,10 @@ export type Settings = {
   visibleQuality: VideoQuality;
   hiddenQuality: VideoQuality;
   notificationsEnabled: boolean;
+};
+
+export type userStatus = {
+  isYoutubePremium: boolean;
 };
 
 export type PopupUISettings = {
