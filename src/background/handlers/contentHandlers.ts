@@ -14,9 +14,7 @@ export async function handleContentMessage(
       .readMultipleSettings()
       .then((s) => s.notificationsEnabled);
     if (enabled) {
-      if (enabled && sender.tab?.title) {
-        queueNotification(sender.tab.title, message.quality);
-      }
+      queueNotification(message.visibility, message.quality);
     }
     return true;
   }

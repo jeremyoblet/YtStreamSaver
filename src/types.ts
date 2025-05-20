@@ -55,5 +55,9 @@ export type MessageResponse = { success: boolean };
 export type Message =
   | { type: "getSettings" }
   | { type: "updateSettings"; settings: Partial<Settings> }
-  | { type: "qualityChanged"; quality: string }
+  | {
+      type: "qualityChanged";
+      quality: string;
+      visibility: "visible" | "hidden";
+    }
   | { type: "notifyTabsQualityChanged" };

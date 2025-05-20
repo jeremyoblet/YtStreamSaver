@@ -160,68 +160,6 @@ export class QualitySwitcher {
     return /premium/i.test(label);
   }
 
-  // async selectQuality(
-  //   targetQuality: VideoQuality,
-  //   callback: (finalQuality: string) => void
-  // ): Promise<void> {
-  //   const qualities = document.querySelectorAll(
-  //     ".ytp-quality-menu .ytp-menuitem-label"
-  //   );
-  //   if (qualities.length === 0) {
-  //     console.warn("[qualitySwitcher] Aucune qualité trouvée.");
-  //     return;
-  //   }
-
-  //   const qualityList = Array.from(qualities)
-  //     .map((q) => {
-  //       const label = q.textContent?.trim() || "";
-  //       return {
-  //         element: q as HTMLElement,
-  //         label,
-  //         resolution: this.extractResolution(label),
-  //         isPlain: this.isPlainResolution(label),
-  //         isPremium: this.isPremium(label),
-  //       };
-  //     })
-  //     .filter((q) => !q.isPremium);
-
-  //   let finalQuality = targetQuality;
-
-  //   if (targetQuality.toLowerCase() === "auto") {
-  //     const auto = qualityList.find((q) =>
-  //       q.label.toLowerCase().includes("auto")
-  //     );
-  //     if (auto) {
-  //       auto.element.click();
-  //       finalQuality = auto.label;
-  //     }
-  //   } else {
-  //     const targetRes = parseInt(targetQuality, 10);
-  //     let match =
-  //       qualityList.find((q) => q.resolution === targetRes && q.isPlain) ||
-  //       qualityList.find((q) => q.resolution === targetRes);
-
-  //     if (match) {
-  //       match.element.click();
-  //       finalQuality = match.label;
-  //     } else {
-  //       const fallback =
-  //         qualityList
-  //           .filter((q) => q.resolution !== null && q.resolution < targetRes)
-  //           .sort((a, b) => b.resolution! - a.resolution!)[0] ||
-  //         qualityList[qualityList.length - 1];
-
-  //       if (fallback) {
-  //         fallback.element.click();
-  //         finalQuality = fallback.label;
-  //       }
-  //     }
-  //   }
-
-  //   console.log(`[qualitySwitcher] Qualité sélectionnée : ${finalQuality}`);
-  //   callback(finalQuality);
-  // }
-
   async selectQuality(
     targetQuality: VideoQuality,
     callback: (finalQuality: string) => void
@@ -313,6 +251,7 @@ export class QualitySwitcher {
     chrome.runtime.sendMessage({
       type: "qualityChanged",
       quality: finalQuality,
+      visibility: document.visibilityState === "visible" ? "visible" : "hidden",
       tabInfo: { title: document.title },
     });
   }

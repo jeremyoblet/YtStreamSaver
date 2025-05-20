@@ -1,47 +1,4 @@
-// type QueuedNotification = { url: string; quality: string };
-
-// let debounceTimer: NodeJS.Timeout | null = null;
-// const notificationBuffer: QueuedNotification[] = [];
-
-// export function queueNotification(url: string, quality: string): void {
-//   notificationBuffer.push({ url, quality });
-
-//   // Réinitialiser le timer s'il existe
-//   if (debounceTimer) {
-//     clearTimeout(debounceTimer);
-//   }
-
-//   // Attendre 150ms après le dernier changement
-//   debounceTimer = setTimeout(() => {
-//     showGroupedNotification(notificationBuffer.slice());
-//     notificationBuffer.length = 0;
-//     debounceTimer = null;
-//   }, 150);
-// }
-
-// function showGroupedNotification(entries: QueuedNotification[]): void {
-//   const message = entries
-//     .map((entry) => `- ${entry.url} : passage à ${entry.quality}`)
-//     .join("\n");
-
-//   const notificationId = `group-${Date.now()}-${Math.random()}`;
-//   chrome.notifications.create(
-//     notificationId,
-//     {
-//       type: "basic",
-//       iconUrl: "icons/icon_128.png",
-//       title: "Qualité changée",
-//       message,
-//     },
-//     (id) => {
-//       setTimeout(() => {
-//         chrome.notifications.clear(id);
-//       }, 3000);
-//     }
-//   );
-// }
-
-type QueuedNotification = { title: string; quality: string };
+type QueuedNotification = { visibility: "visible" | "hidden"; quality: string };
 
 let debounceTimer: NodeJS.Timeout | null = null;
 const notificationBuffer: QueuedNotification[] = [];
@@ -59,11 +16,11 @@ const qualityEmojiMap: Record<string, string> = {
   Auto: "⚙️",
 };
 
-export function queueNotification(title: string, quality: string): void {
-  notificationBuffer.push({
-    title: truncate(title, 60),
-    quality,
-  });
+export function queueNotification(
+  visibility: "visible" | "hidden",
+  quality: string
+): void {
+  notificationBuffer.push({ visibility, quality });
 
   if (debounceTimer) {
     clearTimeout(debounceTimer);
@@ -80,7 +37,9 @@ function showGroupedNotification(entries: QueuedNotification[]): void {
   const message = entries
     .map((entry) => {
       const emoji = qualityEmojiMap[entry.quality] ?? "📺";
-      return `• ${entry.title}  →  ${emoji} ${entry.quality}`;
+      const label =
+        entry.visibility === "visible" ? "tab visible" : "tab cachée";
+      return `• ${label}  →  ${emoji} ${entry.quality}`;
     })
     .join("\n");
 
@@ -99,8 +58,4 @@ function showGroupedNotification(entries: QueuedNotification[]): void {
       }, 3000);
     }
   );
-}
-
-function truncate(text: string, max: number): string {
-  return text.length > max ? text.slice(0, max - 1) + "…" : text;
 }
