@@ -1,5 +1,6 @@
 import { StorageHandler } from "./storageHandler";
 import { Message } from "../../types";
+import { queueNotification } from "./notificationsHandler";
 
 const storage = new StorageHandler();
 
@@ -13,7 +14,9 @@ export async function handleContentMessage(
       .readMultipleSettings()
       .then((s) => s.notificationsEnabled);
     if (enabled) {
-      showNotification(message.quality);
+      if (enabled && sender.tab?.title) {
+        queueNotification(sender.tab.title, message.quality);
+      }
     }
     return true;
   }
@@ -29,20 +32,4 @@ export async function handleContentMessage(
   }
 
   return false;
-}
-
-function showNotification(quality: string): void {
-  chrome.notifications.create(
-    {
-      type: "basic",
-      iconUrl: "icons/icon_128.png",
-      title: "Qualité changée",
-      message: `${quality}`,
-    },
-    (notificationId) => {
-      setTimeout(() => {
-        chrome.notifications.clear(notificationId);
-      }, 2000);
-    }
-  );
 }

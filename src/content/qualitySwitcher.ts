@@ -8,25 +8,29 @@ export class QualitySwitcher {
         console.log("[qualitySwitcher] Extension disabled by user.");
         return;
       }
-  
+
       const isPaused = this.isVideoPaused();
       if (isPaused) {
-        console.log("[qualitySwitcher] Vidéo en pause, aucun changement de qualité.");
+        console.log(
+          "[qualitySwitcher] Vidéo en pause, aucun changement de qualité."
+        );
         return;
       }
-  
+
       const { visibleQuality, hiddenQuality } = storedSettings;
       const targetQuality = document.hidden ? hiddenQuality : visibleQuality;
-  
+
       console.log(`[qualitySwitcher] Qualité appliquée : ${targetQuality}`);
       this.forceCloseSettingsMenu();
       await this.setPlayerQuality(targetQuality);
-  
     } catch (error) {
-      console.error("[qualitySwitcher] Erreur lors du changement de qualité :", error);
+      console.error(
+        "[qualitySwitcher] Erreur lors du changement de qualité :",
+        error
+      );
     }
   }
-  
+
   isVideoPaused(): boolean {
     const video = document.querySelector("video") as HTMLVideoElement | null;
     return video ? video.paused : true;
@@ -67,12 +71,15 @@ export class QualitySwitcher {
 
     this.openSettingsMenu(settingsButton, async () => {
       try {
-        await this.waitForElement(".ytp-quality-menu", 5000);
+        await this.waitForElement(".ytp-quality-menu", 10000);
         await this.selectQuality(targetQuality, (finalQuality) => {
           this.notifyQualityChange(finalQuality);
         });
       } catch (err) {
-        console.warn("[qualitySwitcher] Le menu qualité ne s'est pas affiché :", err);
+        console.warn(
+          "[qualitySwitcher] Le menu qualité ne s'est pas affiché :",
+          err
+        );
       }
     });
   }
@@ -86,7 +93,7 @@ export class QualitySwitcher {
     try {
       const qualityItem = await this.waitForElement(
         ".ytp-menuitem-label",
-        2000,
+        10000,
         (el) => el.textContent?.toLowerCase().includes("qualit") ?? false
       );
 
@@ -223,12 +230,12 @@ export class QualitySwitcher {
       const qualities = document.querySelectorAll(
         ".ytp-quality-menu .ytp-menuitem-label"
       );
-  
+
       if (qualities.length === 0) {
         console.warn("[qualitySwitcher] Aucune qualité trouvée.");
         return;
       }
-  
+
       const qualityList = Array.from(qualities)
         .map((q) => {
           const label = q.textContent?.trim() || "";
@@ -241,9 +248,9 @@ export class QualitySwitcher {
           };
         })
         .filter((q) => !q.isPremium);
-  
+
       let finalQuality = targetQuality;
-  
+
       if (targetQuality.toLowerCase() === "auto") {
         const auto = qualityList.find((q) =>
           q.label.toLowerCase().includes("auto")
@@ -257,7 +264,7 @@ export class QualitySwitcher {
         let match =
           qualityList.find((q) => q.resolution === targetRes && q.isPlain) ||
           qualityList.find((q) => q.resolution === targetRes);
-  
+
         if (match) {
           match.element.click();
           finalQuality = match.label;
@@ -267,21 +274,23 @@ export class QualitySwitcher {
               .filter((q) => q.resolution !== null && q.resolution! < targetRes)
               .sort((a, b) => b.resolution! - a.resolution!)[0] ||
             qualityList[qualityList.length - 1];
-  
+
           if (fallback) {
             fallback.element.click();
             finalQuality = fallback.label;
           }
         }
       }
-  
+
       console.log(`[qualitySwitcher] Qualité sélectionnée : ${finalQuality}`);
       callback(finalQuality);
     } catch (error) {
-      console.error("[qualitySwitcher] Erreur lors de la sélection de qualité :", error);
+      console.error(
+        "[qualitySwitcher] Erreur lors de la sélection de qualité :",
+        error
+      );
     }
   }
-  
 
   forceCloseSettingsMenu(): void {
     const menu = document.querySelector(".ytp-settings-menu");
