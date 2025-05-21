@@ -1,4 +1,4 @@
-import { Settings, VideoQuality } from "../types";
+import { Settings, VideoQuality } from "../../types";
 
 export class QualitySwitcher {
   async handleVisibilityChange(): Promise<void> {
