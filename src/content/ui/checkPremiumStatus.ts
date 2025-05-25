@@ -1,4 +1,4 @@
-asyns function checkIfUserIsPremium(): boolean {
+export async function checkIfUserIsPremium(): boolean {
     const logoType: string = getLogoType();
     if (logoType === "YOUTUBE_PREMIUM_LOGO") {
         return true;

@@ -1,4 +1,5 @@
 import { Settings, VideoQuality } from "../../types";
+import { checkIfUserIsPremium } from "../ui/checkPremiumStatus";
 
 /**
  * quand on ouvre le popup, regarder si on est premium ou pas
