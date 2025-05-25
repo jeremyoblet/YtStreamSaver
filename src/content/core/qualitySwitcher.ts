@@ -1,6 +1,17 @@
 import { Settings, VideoQuality } from "../../types";
 
+/**
+ * quand on ouvre le popup, regarder si on est premium ou pas
+ *     si premium, charger les qualites  dans le settings popup
+ *     sinon charger uniquement les qualites standard dans le settings popup
+ *
+ *  quand on change la qualite de la video
+ *      si premium, mettre uniquement la qualite
+ *      sinonm filtrer les qualites premium dans le menu settings du player
+ */
+
 export class QualitySwitcher {
+
   async handleVisibilityChange(): Promise<void> {
     try {
       const storedSettings = await this.getQualitiesFromBackground();
@@ -110,11 +121,7 @@ export class QualitySwitcher {
     }
   }
 
-  async waitForElement(
-    selector: string,
-    timeout: number = 2000,
-    validateFn?: (el: Element) => boolean
-  ): Promise<Element> {
+  async waitForElement(selector: string, timeout: number = 2000, validateFn?: (el: Element) => boolean): Promise<Element> {
     return new Promise((resolve, reject) => {
       const tryMatch = () => {
         const candidates = document.querySelectorAll(selector);
@@ -160,17 +167,11 @@ export class QualitySwitcher {
     return /premium/i.test(label);
   }
 
-  async selectQuality(
-    targetQuality: VideoQuality,
-    callback: (finalQuality: string) => void
-  ): Promise<void> {
+  async selectQuality(targetQuality: VideoQuality, callback: (finalQuality: string) => void): Promise<void> {
     try {
-      const qualities = document.querySelectorAll(
-        ".ytp-quality-menu .ytp-menuitem-label"
-      );
-
+      const qualities = document.querySelectorAll(".ytp-quality-menu .ytp-menuitem-label");
       if (qualities.length === 0) {
-        console.warn("[qualitySwitcher] Aucune qualité trouvée.");
+        console.warn("[qualitySwitcher] No quality found.");
         return;
       }
 
@@ -223,27 +224,17 @@ export class QualitySwitcher {
       console.log(`[qualitySwitcher] Qualité sélectionnée : ${finalQuality}`);
       callback(finalQuality);
     } catch (error) {
-      console.error(
-        "[qualitySwitcher] Erreur lors de la sélection de qualité :",
-        error
-      );
+      console.error("[qualitySwitcher] Erreur lors de la sélection de qualité :", error);
     }
   }
 
   forceCloseSettingsMenu(): void {
-    const menu = document.querySelector(".ytp-settings-menu");
-    const button = document.querySelector(
-      ".ytp-settings-button"
-    ) as HTMLElement | null;
+    const menuSettings = document.querySelector(".ytp-settings-menu");
+    const buttonSettings = document.querySelector(".ytp-settings-button") as HTMLElement | null;
 
-    if (
-      menu &&
-      menu instanceof HTMLElement &&
-      menu.offsetParent !== null &&
-      button
-    ) {
-      button.click();
-      console.log("[qualitySwitcher] Menu paramètres fermé manuellement.");
+    if (menuSettings && menuSettings instanceof HTMLElement && menuSettings.offsetParent !== null && buttonSettings) {
+      buttonSettings.click();
+      console.log("[qualitySwitcher] Settings menu closed manually.");
     }
   }
 
