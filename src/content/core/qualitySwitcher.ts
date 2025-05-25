@@ -49,7 +49,7 @@ export class QualitySwitcher {
         chrome.runtime.sendMessage({ type: "getSettings" }, (response) => {
           if (chrome.runtime.lastError || !response?.settings) {
             console.warn(
-              "[qualitySwitcher] Impossible to get settings :",
+              "[qualitySwitcher] Impossible to get settings from storage :",
               chrome.runtime.lastError
             );
             resolve(null);
@@ -68,9 +68,7 @@ export class QualitySwitcher {
   }
 
   async setPlayerQuality(targetQuality: VideoQuality): Promise<void> {
-    const settingsButton = document.querySelector(
-      ".ytp-settings-button"
-    ) as HTMLElement | null;
+    const settingsButton = document.querySelector(".ytp-settings-button") as HTMLElement | null;
     if (!settingsButton) {
       console.log("[qualitySwitcher] Settings button not found.");
       return;
@@ -165,6 +163,8 @@ export class QualitySwitcher {
 
   async selectQuality(targetQuality: VideoQuality, callback: (finalQuality: string) => void): Promise<void> {
     try {
+      const isPremiumUser = await checkIfUserIsPremium();
+      console.log(`isPremiumUser: ${isPremiumUser}`);
       const qualities = document.querySelectorAll(".ytp-quality-menu .ytp-menuitem-label");
       if (qualities.length === 0) {
         console.warn("[qualitySwitcher] No quality found.");
@@ -182,8 +182,7 @@ export class QualitySwitcher {
             isPremium: this.isPremium(label),
           };
         })
-        .filter((q) => !q.isPremium);
-
+          .filter((q) => isPremiumUser || !q.isPremium);
       let finalQuality = targetQuality;
 
       if (targetQuality.toLowerCase() === "auto") {
