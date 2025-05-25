@@ -22,23 +22,18 @@ export class QualitySwitcher {
 
       const isPaused = this.isVideoPaused();
       if (isPaused) {
-        console.log(
-          "[qualitySwitcher] Vidéo en pause, aucun changement de qualité."
-        );
+        console.log("[qualitySwitcher] Video is paused, no quality changing performed.");
         return;
       }
 
       const { visibleQuality, hiddenQuality } = storedSettings;
       const targetQuality = document.hidden ? hiddenQuality : visibleQuality;
 
-      console.log(`[qualitySwitcher] Qualité appliquée : ${targetQuality}`);
+      console.log(`[qualitySwitcher] Quality applied : ${targetQuality}`);
       this.forceCloseSettingsMenu();
       await this.setPlayerQuality(targetQuality);
     } catch (error) {
-      console.error(
-        "[qualitySwitcher] Erreur lors du changement de qualité :",
-        error
-      );
+      console.error("[qualitySwitcher] Error when quality changing :", error);
     }
   }
 
@@ -53,7 +48,7 @@ export class QualitySwitcher {
         chrome.runtime.sendMessage({ type: "getSettings" }, (response) => {
           if (chrome.runtime.lastError || !response?.settings) {
             console.warn(
-              "[qualitySwitcher] Impossible de récupérer les réglages :",
+              "[qualitySwitcher] Impossible to get settings :",
               chrome.runtime.lastError
             );
             resolve(null);
@@ -76,7 +71,7 @@ export class QualitySwitcher {
       ".ytp-settings-button"
     ) as HTMLElement | null;
     if (!settingsButton) {
-      console.log("[qualitySwitcher] Bouton des paramètres non trouvé.");
+      console.log("[qualitySwitcher] Settings button not found.");
       return;
     }
 
@@ -88,7 +83,7 @@ export class QualitySwitcher {
         });
       } catch (err) {
         console.warn(
-          "[qualitySwitcher] Le menu qualité ne s'est pas affiché :",
+          "[qualitySwitcher] Settings menu is not open :",
           err
         );
       }
@@ -112,11 +107,11 @@ export class QualitySwitcher {
         qualityItem.click();
         setTimeout(callback, 500);
       } else {
-        console.warn("[qualitySwitcher] Élément 'qualité' non trouvé.");
+        console.warn("[qualitySwitcher] Element 'quality' not found.");
         this.forceCloseSettingsMenu();
       }
     } catch (err) {
-      console.warn("[qualitySwitcher] Timeout sur openSettingsMenu :", err);
+      console.warn("[qualitySwitcher] Timeout on openSettingsMenu :", err);
       this.forceCloseSettingsMenu();
     }
   }
@@ -137,7 +132,7 @@ export class QualitySwitcher {
       const timeoutId = setTimeout(() => {
         observer.disconnect();
         reject(
-          `⏱ Timeout : élément '${selector}' introuvable après ${timeout}ms`
+          `⏱ Timeout : element '${selector}' notr found after ${timeout}ms`
         );
       }, timeout);
 
@@ -221,10 +216,10 @@ export class QualitySwitcher {
         }
       }
 
-      console.log(`[qualitySwitcher] Qualité sélectionnée : ${finalQuality}`);
+      console.log(`[qualitySwitcher] Selected quality : ${finalQuality}`);
       callback(finalQuality);
     } catch (error) {
-      console.error("[qualitySwitcher] Erreur lors de la sélection de qualité :", error);
+      console.error("[qualitySwitcher] Error when quality selection :", error);
     }
   }
 
