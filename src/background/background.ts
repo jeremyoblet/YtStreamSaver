@@ -28,15 +28,3 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   return true;
 });
-
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (
-    changeInfo.status === "complete" &&
-    tab.url?.includes("youtube.com/watch")
-  ) {
-    chrome.scripting.executeScript({
-      target: { tabId },
-      files: ["content.js"],
-    });
-  }
-});

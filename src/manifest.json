@@ -3,7 +3,14 @@
   "version": "0.1.0",
   "manifest_version": 3,
   "description": "Automatically adjusts YouTube video quality based on tab or window visibility.",
-  "permissions": ["notifications", "storage", "tabs", "scripting"],
+  "permissions": ["notifications", "storage", "tabs"],
+  "content_scripts": [
+    {
+      "matches": ["*://www.youtube.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
   "background": {
     "service_worker": "background.js",
     "type": "module"
