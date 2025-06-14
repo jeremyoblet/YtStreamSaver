@@ -1,7 +1,7 @@
 import { Settings, VideoQuality } from "../../types";
 import { checkIfUserIsPremium } from "../ui/checkPremiumStatus";
 
-/**
+/** TODO
  * quand on ouvre le popup, regarder si on est premium ou pas
  *     si premium, charger les qualites  dans le settings popup
  *     sinon charger uniquement les qualites standard dans le settings popup
@@ -31,7 +31,7 @@ export class QualitySwitcher {
       const targetQuality = document.hidden ? hiddenQuality : visibleQuality;
 
       console.log(`[qualitySwitcher] Quality applied : ${targetQuality}`);
-      this.forceCloseSettingsMenu();
+      // this.forceCloseSettingsMenu();
       await this.setPlayerQuality(targetQuality);
     } catch (error) {
       console.error("[qualitySwitcher] Error when quality changing :", error);
@@ -221,6 +221,9 @@ export class QualitySwitcher {
     } catch (error) {
       console.error("[qualitySwitcher] Error when quality selection :", error);
     }
+    setTimeout(() => {
+      this.forceCloseSettingsMenu();
+    }, 500);
   }
 
   forceCloseSettingsMenu(): void {
