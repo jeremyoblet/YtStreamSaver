@@ -1,17 +1,57 @@
-# Ignorer les dépendances
+########################################
+# 📦 Dépendances Node.js
+########################################
 node_modules/
+package-lock.json
 
-# Ignorer les fichiers de build
+########################################
+# 🛠️ Fichiers de build (esbuild, zip)
+########################################
 dist/
 dist.zip
 
-# Ignorer les fichiers de logs
+########################################
+# 📄 Fichiers logs
+########################################
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Ignorer les fichiers de l'éditeur
+########################################
+# 🧪 Tests
+########################################
+
+# ▶️ Playwright
+test-results/
+*.zip        # traces compressées
+*.webm       # vidéos de sessions
+*.trace      # fichiers de trace Playwright
+
+# 🧪 Vitest
+coverage/
+
+########################################
+# 🧑‍💻 Fichiers d'éditeur (IDE)
+########################################
+
+# VS Code
 .vscode/
 *.code-workspace
 
-# Ignorer le système de l'OS
+# JetBrains / WebStorm / IntelliJ
+.idea/
+
+########################################
+# 🖥️ Fichiers système
+########################################
 .DS_Store
 Thumbs.db
+
+########################################
+# 🔧 Autres temporaires possibles
+########################################
+*.tmp
+*.swp
+*.swo
+*.bak
