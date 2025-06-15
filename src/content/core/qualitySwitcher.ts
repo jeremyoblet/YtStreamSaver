@@ -31,7 +31,7 @@ export class QualitySwitcher {
       const targetQuality = document.hidden ? hiddenQuality : visibleQuality;
 
       console.log(`[qualitySwitcher] Quality applied : ${targetQuality}`);
-      // this.forceCloseSettingsMenu();
+      this.forceCloseSettingsMenu();  // garanti que le menu des settings est fermé avant la procedure de changement de qualité
       await this.setPlayerQuality(targetQuality);
     } catch (error) {
       console.error("[qualitySwitcher] Error when quality changing :", error);
