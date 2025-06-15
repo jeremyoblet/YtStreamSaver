@@ -6,7 +6,8 @@
   "scripts": {
     "build": "node build.js",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "playwright:test": "playwright test"
   },
   "repository": {
     "type": "git",
@@ -21,10 +22,12 @@
   "homepage": "https://github.com/jeremyoblet/YtStreamSaver#readme",
   "devDependencies": {
     "@eslint/js": "^9.25.1",
+    "@playwright/test": "^1.53.0",
     "@types/chrome": "^0.0.320",
     "esbuild": "^0.25.4",
     "eslint": "^9.25.1",
     "globals": "^16.0.0",
+    "playwright": "^1.53.0",
     "typescript": "^5.8.3"
   }
 }
