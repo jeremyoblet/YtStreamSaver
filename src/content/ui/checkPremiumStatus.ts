@@ -1,5 +1,5 @@
-export async function checkIfUserIsPremium(): boolean {
-    const logoType: string = getLogoType();
+export async function checkIfUserIsPremium(): Promise<boolean> {
+    const logoType: string | null = getLogoType();
     if (logoType === "YOUTUBE_PREMIUM_LOGO") {
         return true;
     }
