@@ -1,4 +1,4 @@
-# 🎥 Stream Saver Extension (Chrome Extension)
+# 🎥 GREEN STREAM ON (Chrome Extension)
 
 **Automatically optimize YouTube video quality based on Chrome tab or window visibility.**
 
@@ -16,12 +16,29 @@ The project follows a **modular** and **scalable** design, inspired by hexagonal
 
 ```
 src/
-├── background/        # Event-driven background scripts
-├── content/           # Injected scripts that run in YouTube pages
-├── popup/             # UI shown when clicking the extension icon
-├── storage/           # Abstractions over Chrome storage
-├── youtube/           # YouTube-specific logic and API interactions
-└── lib/               # Shared utilities and helper functions
+├── background/        # Scripts d'arrière-plan (event pages, listeners globaux)
+│   ├── handlers/      # Fonctions spécifiques aux événements du runtime ou messages
+│   ├── background.ts  # Entrée principale du background script
+│   └── defaultSettings.ts  # Valeurs par défaut pour la configuration utilisateur
+
+├── content/           # Scripts injectés dans les pages YouTube
+│   ├── .debug/        # Outils de debug pour les content scripts
+│   ├── core/          # Logique métier centrale exécutée côté page
+│   ├── ui/            # Gestion de l'interface modifiée sur YouTube
+│   ├── utils/         # Fonctions utilitaires côté content
+│   ├── content.ts     # Script principal injecté
+│   └── listeners.ts   # Écouteurs DOM ou message côté page
+
+├── popup/             # Code de l'interface (popup) affichée à l'utilisateur
+│   ├── messaging.ts   # Communication entre popup et background
+│   ├── popup.html     # Fichier HTML principal
+│   ├── popup.ts       # Logique principale de l'UI (source TypeScript)
+│   ├── popup.js       # Version compilée JS (si générée)
+│   ├── styles.css     # Styles du popup
+│   └── ui.ts          # Composants ou logique UI
+
+├── manifest.json      # Fichier de configuration de l'extension Chrome
+├── types.ts           # Déclarations de types partagés entre les modules
 ```
 
 ## 🥪 How It Works
@@ -66,7 +83,6 @@ A GitHub Actions pipeline builds and (optionally) publishes the extension to the
 
 * `tabs`
 * `storage`
-* `scripting`
 * `notifications`
 
 ## 📌 Roadmap
