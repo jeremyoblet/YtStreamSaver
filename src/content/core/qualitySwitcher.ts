@@ -76,7 +76,7 @@ export class QualitySwitcher {
 
     this.openSettingsMenu(settingsButton, async () => {
       try {
-        await this.waitForElement(".ytp-quality-menu", 10000);
+        await this.waitForElement(".ytp-quality-menu", 20000);
         await this.selectQuality(targetQuality, (finalQuality) => {
           this.notifyQualityChange(finalQuality);
         });
